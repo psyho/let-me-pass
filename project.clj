@@ -1,15 +1,15 @@
 (defproject password-helper "0.1.0-SNAPSHOT"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.5.1"]
-                 [org.clojure/clojurescript "0.0-2156"]
-                 [org.clojure/core.async "0.1.242.0-44b1e3-alpha"]
-                 [khroma "0.0.2"]
-                 [prismatic/dommy "0.1.2"]]
+  :dependencies [[org.clojure/clojure "1.9.0"]
+                 [org.clojure/clojurescript "1.9.946"]
+                 [org.clojure/core.async "0.4.474"]
+                 [khroma "0.3.0"]
+                 [prismatic/dommy "1.1.0"]]
   :source-paths ["src"]
   :profiles {:dev
-             {:plugins [[com.cemerick/austin "0.1.3"]
-                        [lein-cljsbuild "1.0.1"]
+             {:plugins [[com.cemerick/austin "0.1.6"]
+                        [lein-cljsbuild "1.1.7"]
                         [lein-chromebuild "0.3.0"]]
               :cljsbuild
               {:builds
