@@ -38,15 +38,34 @@
 
 (defn find-partial-password-inputs
   "Scans the page for inputs that are characteristic to partial passwords"
-  []
-  (->> (sel :input)
+  [root]
+  (->> (sel root :input)
        (filter #(= "password" (dommy/attr % :type)))
        (filter #(= "1" (dommy/attr % :maxlength)))))
+
+(defn frame-documents
+  "Returns document objects for all frames found in document"
+  [document]
+  (letfn [(content-documents [tag] (map #(.-contentDocument %) (->Array (sel document tag))))]
+    (concat
+      (content-documents :frame)
+      (content-documents :iframe))))
+
+(defn all-frame-docs
+  "Returns a collection of all frame documents on the page (recursively) including the top-level document"
+  ([]
+   (all-frame-docs [js/document]))
+
+  ([documents]
+   (if (seq documents)
+     (let [first-doc (first documents)]
+       (lazy-seq (cons first-doc (all-frame-docs (concat (rest documents) (frame-documents first-doc))))))
+     (lazy-seq))))
 
 (defn page-contains-partial-password?
   "Checks input on a page and returns true if the pages seems to contain a partial password"
   []
-  (seq (find-partial-password-inputs)))
+  (some #(seq (find-partial-password-inputs %)) (all-frame-docs)))
 
 (defn start-password-helper
   "Start Password Helper on the page (add HTML, register event handlers, etc)"
@@ -65,7 +84,7 @@
 (defn listen-for-page-changes
   "If any change in DOM happens, checks if it seems like the page contains partial password and adds password helper in such case"
   []
-  (let [mutation-observer (js/MutationObserver. (fn [muts]
+  (let [mutation-observer (js/MutationObserver. (fn [_]
                                                   (if (page-contains-partial-password?)
                                                     (start-password-helper)
                                                     (remove-password-helper))))]
