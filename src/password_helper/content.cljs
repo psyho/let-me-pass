@@ -1,5 +1,6 @@
 (ns password-helper.content
   (:require [khroma.log :as console]
+            [khroma.extension :as extension]
             [dommy.core :as dommy :refer-macros [sel1 sel]]
             [dommy.utils :refer [->Array]]
             [hipo.core :as hipo]))
@@ -16,12 +17,29 @@
   [:div#password-helper-box
    [:input {:type "password" :placeholder "Password Helper" :id "password-helper-input"}]])
 
-(defn inject-html
+(defn inject-password-helper-box
   "Injects password helper HTML element into the current page"
   [document]
-  (debug "Injecting Password Helper HTML")
   (.appendChild (.-body document)
                 (hipo/create (password-helper-box))))
+
+(defn password-helper-stylesheet
+  "Link to the extension stylesheet"
+  []
+  [:link {:type "text/css" :rel "stylesheet" :href (extension/get-url "password_helper.css")}])
+
+(defn inject-stylesheet
+  "Injects password helper CSS into document HEAD"
+  [document]
+  (.appendChild (.-head document)
+                (hipo/create (password-helper-stylesheet))))
+
+(defn inject-html
+  "Injects password helper HTML and stylesheet into the page"
+  [document]
+  (debug "Injecting Password Helper HTML")
+  (inject-stylesheet document)
+  (inject-password-helper-box document))
 
 (defn on-input-change
   "This function is called whenever the password input changes with the new password value"

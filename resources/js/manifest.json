@@ -10,10 +10,10 @@
     {
       "matches": ["*://*/*"],
       "js": ["password_helper.js", "content.js"],
-      "css": ["password_helper.css"],
       "run_at": "document_end"
     }
   ],
+  "web_accessible_resources": ["password_helper.css"],
   "manifest_version": 2
 }
 
