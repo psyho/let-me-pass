@@ -18,9 +18,9 @@
 
 (defn inject-html
   "Injects password helper HTML element into the current page"
-  []
+  [document]
   (debug "Injecting Password Helper HTML")
-  (.appendChild js/document.body
+  (.appendChild (.-body document)
                 (hipo/create (password-helper-box))))
 
 (defn on-input-change
@@ -30,8 +30,9 @@
 
 (defn listen-for-input-changes
   "Registers event handler to listen to input changes on the password input"
-  []
-  (let [input (sel1 :#password-helper-input)
+  [document]
+  (let [body (.-body document)
+        input (sel1 body :#password-helper-input)
         handler (fn [event] (on-input-change (dommy/value input)))]
     (debug "Registering change handler")
     (dommy/listen! input :keyup handler)))
@@ -65,15 +66,15 @@
 (defn page-contains-partial-password?
   "Checks input on a page and returns true if the pages seems to contain a partial password"
   []
-  (some #(seq (find-partial-password-inputs %)) (all-frame-docs)))
+  (first (filter #(seq (find-partial-password-inputs %)) (all-frame-docs))))
 
 (defn start-password-helper
   "Start Password Helper on the page (add HTML, register event handlers, etc)"
-  []
+  [document]
   (when-not (sel1 :#password-helper-box)
     (debug "Injecting Password Helper")
-    (inject-html)
-    (listen-for-input-changes)))
+    (inject-html document)
+    (listen-for-input-changes document)))
 
 (defn remove-password-helper
   "Removes password helper input from the page, if added"
@@ -85,8 +86,8 @@
   "If any change in DOM happens, checks if it seems like the page contains partial password and adds password helper in such case"
   []
   (let [mutation-observer (js/MutationObserver. (fn [_]
-                                                  (if (page-contains-partial-password?)
-                                                    (start-password-helper)
+                                                  (if-let [document (page-contains-partial-password?)]
+                                                    (start-password-helper document)
                                                     (remove-password-helper))))]
     (.observe mutation-observer js/document.body #js {:childList true :subtree true})))
 
@@ -99,6 +100,6 @@
 (defn init
   "Main entry point of the application. Called from content.js"
   []
-  (dommy/listen! js/window :load #(if (page-contains-partial-password?)
-                                           (start-password-helper)
+  (dommy/listen! js/window :load #(if-let [document (page-contains-partial-password?)]
+                                           (start-password-helper document)
                                            (wait-to-add-password-helper))))
