@@ -41,19 +41,20 @@
   (inject-stylesheet document)
   (inject-password-helper-box document))
 
-(defn on-input-change
-  "This function is called whenever the password input changes with the new password value"
-  [password]
-  (debug (str "New password is \"" password "\"")))
+(defn label-for-input
+  "Return the label for input based on the for attribute"
+  [input]
+  (let [id (dommy/attr input :id)]
+    (sel1 (str "label[for=" id "]"))))
 
-(defn listen-for-input-changes
-  "Registers event handler to listen to input changes on the password input"
-  [document]
-  (let [body (.-body document)
-        input (sel1 body :#password-helper-input)
-        handler (fn [event] (on-input-change (dommy/value input)))]
-    (debug "Registering change handler")
-    (dommy/listen! input :keyup handler)))
+(defn index-for-input
+  "Return the character index for editable password inputs"
+  [input]
+  (let [label (label-for-input input)
+        text (dommy/text label)
+        digits (first (re-seq #"\d+" text))
+        number (js/parseInt digits)]
+    (dec number)))
 
 (defn find-partial-password-inputs
   "Scans the page for inputs that are characteristic to partial passwords"
@@ -61,6 +62,33 @@
   (->> (sel root :input)
        (filter #(= "password" (dommy/attr % :type)))
        (filter #(= "1" (dommy/attr % :maxlength)))))
+
+(defn build-index-input-map
+  "Return a map of index => password field with password character indexes as keys"
+  [document]
+  (->> (find-partial-password-inputs document)
+       (filter #(not= "disabled" (dommy/attr % :disabled)))
+       (map #(vector (index-for-input %) %))
+       (into {})))
+
+(defn on-input-change
+  "This function is called whenever the password input changes with the new password value"
+  [password input-map]
+  (doseq [[idx input] input-map]
+    (if-let [char (get password idx)]
+      (dommy/set-value! input char)
+      (dommy/set-value! input ""))))
+
+(defn listen-for-input-changes
+  "Registers event handler to listen to input changes on the password input"
+  [document]
+  (let [body (.-body document)
+        input-map (build-index-input-map document)
+        input (sel1 body :#password-helper-input)
+        handler (fn [event] (on-input-change (dommy/value input) input-map))]
+    (debug "Registering change handler")
+    (dommy/listen! input :keyup handler :paste handler)))
+
 
 (defn frame-documents
   "Returns document objects for all frames found in document"
