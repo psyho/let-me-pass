@@ -41,17 +41,36 @@
   (inject-stylesheet document)
   (inject-password-helper-box document))
 
+(defn label-from-input-id
+  "If input has an ID try to look up label for it based on the for attribute"
+  [input document]
+  (if-let [id (dommy/attr input :id)]
+    (sel1 (.-body document) (str "label[for=" id "]"))))
+
+(defn label-nearby
+  "Finds label that is in the same parent element as the input"
+  [input]
+  (sel1 (dommy/parent input) :label))
+
 (defn label-for-input
   "Return the label for input based on the for attribute"
   [input document]
-  (let [id (dommy/attr input :id)]
-    (sel1 (.-body document) (str "label[for=" id "]"))))
+  (or
+    (label-from-input-id input document)
+    (label-nearby input)))
+
+(defn get-text
+  "Returns element's text, handles nils gracefully"
+  [elem]
+  (if elem
+    (dommy/text elem)
+    ""))
 
 (defn index-for-input
   "Return the character index for editable password inputs"
   [input document]
   (let [label (label-for-input input document)
-        text (dommy/text label)
+        text (get-text label)
         digits (first (re-seq #"\d+" text))
         number (js/parseInt digits)]
     (dec number)))
