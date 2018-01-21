@@ -43,14 +43,14 @@
 
 (defn label-for-input
   "Return the label for input based on the for attribute"
-  [input]
+  [input document]
   (let [id (dommy/attr input :id)]
-    (sel1 (str "label[for=" id "]"))))
+    (sel1 (.-body document) (str "label[for=" id "]"))))
 
 (defn index-for-input
   "Return the character index for editable password inputs"
-  [input]
-  (let [label (label-for-input input)
+  [input document]
+  (let [label (label-for-input input document)
         text (dommy/text label)
         digits (first (re-seq #"\d+" text))
         number (js/parseInt digits)]
@@ -68,12 +68,13 @@
   [document]
   (->> (find-partial-password-inputs document)
        (filter #(not= "disabled" (dommy/attr % :disabled)))
-       (map #(vector (index-for-input %) %))
+       (map #(vector (index-for-input % document) %))
        (into {})))
 
 (defn on-input-change
   "This function is called whenever the password input changes with the new password value"
   [password input-map]
+  (debug (str "Password changed to " \" password \"))
   (doseq [[idx input] input-map]
     (if-let [char (get password idx)]
       (dommy/set-value! input char)
@@ -87,7 +88,7 @@
         input (sel1 body :#password-helper-input)
         handler (fn [event] (on-input-change (dommy/value input) input-map))]
     (debug "Registering change handler")
-    (dommy/listen! input :keyup handler :paste handler)))
+    (dommy/listen! input :input handler)))
 
 
 (defn frame-documents
