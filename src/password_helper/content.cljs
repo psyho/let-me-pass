@@ -15,6 +15,8 @@
   "The main HTML element injected into the page"
   []
   [:div#password-helper-box
+   ;; needed to hack around the fact that Chrome has broken KeyboardEvents that don't accept keyCode and which
+   [:script {:type "text/javascript" :src (extension/get-url "simulate_input.js")}]
    [:input {:type "password" :placeholder "Password Helper" :id "password-helper-input"}]])
 
 (defn inject-password-helper-box
@@ -90,14 +92,29 @@
        (map #(vector (index-for-input % document) %))
        (into {})))
 
+(defn input-id!
+  "Returns the id of the given input, if input has no ID, then assigns a random one to it"
+  [input]
+  (when-not (dommy/attr input :id)
+    (dommy/set-attr! input :id (random-uuid)))
+  (dommy/attr input :id))
+
+(defn simulate-user-input
+  "Simulates user typing into an input"
+  [input value]
+  ;; see simulate_input.js for the part that listens to this event and triggers actual events on the input
+  (let [event (js/CustomEvent. "simulate-input" #js {:bubbles true
+                                                     :cancelable true
+                                                     :detail #js {:id (input-id! input)
+                                                                  :value value}})]
+    (.dispatchEvent input event)))
+
 (defn on-input-change
   "This function is called whenever the password input changes with the new password value"
   [password input-map]
   (debug (str "Password changed to " \" password \"))
   (doseq [[idx input] input-map]
-    (if-let [char (get password idx)]
-      (dommy/set-value! input char)
-      (dommy/set-value! input ""))))
+    (simulate-user-input input (get password idx ""))))
 
 (defn listen-for-input-changes
   "Registers event handler to listen to input changes on the password input"

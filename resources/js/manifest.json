@@ -13,7 +13,7 @@
       "run_at": "document_end"
     }
   ],
-  "web_accessible_resources": ["password_helper.css"],
+  "web_accessible_resources": ["password_helper.css", "simulate_input.js"],
   "manifest_version": 2
 }
 
