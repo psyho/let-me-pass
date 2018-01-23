@@ -86,8 +86,6 @@
   "If input is inside a table row, returns a 1-based index of its position in that row, nil otherwise"
   [input]
   (when-let [parent-cell (find-parent input "td")]
-    (debug input)
-    (debug (index-in-parent parent-cell))
     (str (inc (index-in-parent parent-cell)))))
 
 (defn label-text-for-input
@@ -106,12 +104,18 @@
         number (js/parseInt digits)]
     (dec number)))
 
+(defn partial-password-input?
+  "Checks if element looks like a partial password input"
+  [element]
+  (and
+    (= "password" (dommy/attr element :type))
+    (= "1" (dommy/attr element :maxlength))))
+
 (defn find-partial-password-inputs
   "Scans the page for inputs that are characteristic to partial passwords"
   [root]
   (->> (sel root :input)
-       (filter #(= "password" (dommy/attr % :type)))
-       (filter #(= "1" (dommy/attr % :maxlength)))))
+       (filter partial-password-input?)))
 
 (defn build-index-input-map
   "Return a map of index => password field with password character indexes as keys"
@@ -156,6 +160,16 @@
     (debug "Registering change handler")
     (dommy/listen! input :input handler)))
 
+(defn maintain-input-focus
+  "Don't let the password input lose focus until after user stops typing (500ms after last key press)"
+  []
+  (let [last-keypress-time (atom (js/Date. 0))
+        input (sel1 :#password-helper-input)
+        update-keypress-time #(reset! last-keypress-time (js/Date.))
+        elapsed-since-last-keypress #(- (.getTime (js/Date.)) (.getTime @last-keypress-time))]
+    (dommy/listen! input :keydown update-keypress-time :keyup update-keypress-time)
+    (dommy/listen! input :blur #(if (< (elapsed-since-last-keypress) 500)
+                                  (.focus input)))))
 
 (defn frame-documents
   "Returns document objects for all frames found in document"
@@ -187,7 +201,8 @@
   (when-not (sel1 :#password-helper-box)
     (debug "Injecting Password Helper")
     (inject-html document)
-    (listen-for-input-changes document)))
+    (listen-for-input-changes document)
+    (maintain-input-focus)))
 
 (defn remove-password-helper
   "Removes password helper input from the page, if added"
