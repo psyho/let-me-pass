@@ -20,6 +20,7 @@
                                      :output-dir "target/unpacked"
                                      :optimizations :whitespace
                                      :source-map "target/unpacked/password_helper.js.map"
+                                     :closure-output-charset "US-ASCII"
                                      :pretty-print true}}}}
               :chromebuild {:resource-paths ["resources/js" "resources/css" "resources/images"]
                             :target-path "target/unpacked"}}})

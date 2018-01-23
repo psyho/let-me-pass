@@ -1,6 +1,7 @@
 (ns password-helper.content
   (:require [khroma.log :as console]
             [khroma.extension :as extension]
+            [goog.dom :as gdom]
             [dommy.core :as dommy :refer-macros [sel1 sel]]
             [dommy.utils :refer [->Array]]
             [hipo.core :as hipo]))
@@ -43,37 +44,65 @@
   (inject-stylesheet document)
   (inject-password-helper-box document))
 
+(defn try-find
+  "Tries to select the element, hides exceptions"
+  [element selector]
+  (try
+    (sel1 element selector)
+    (catch :default e
+      (console/warn e)
+      nil)))
+
 (defn label-from-input-id
   "If input has an ID try to look up label for it based on the for attribute"
   [input document]
   (if-let [id (dommy/attr input :id)]
-    (sel1 (.-body document) (str "label[for=" id "]"))))
+    (try-find (.-body document) (str "label[for=" id "]"))))
 
 (defn label-nearby
   "Finds label that is in the same parent element as the input"
   [input]
   (sel1 (dommy/parent input) :label))
 
-(defn label-for-input
-  "Return the label for input based on the for attribute"
-  [input document]
-  (or
-    (label-from-input-id input document)
-    (label-nearby input)))
-
 (defn get-text
   "Returns element's text, handles nils gracefully"
   [elem]
   (if elem
-    (dommy/text elem)
-    ""))
+    (dommy/text elem)))
+
+(defn find-parent
+  "Recursively traverses the DOM to find a parent matching the given tag name"
+  [element tag-name]
+  (gdom/getAncestorByTagNameAndClass element tag-name))
+
+(defn index-in-parent
+  "Returns a 0 based index of element in its parent node"
+  [element]
+  (let [parent (dommy/parent element)
+        children (->Array (dommy/children parent))]
+    (.indexOf children element)))
+
+(defn position-in-table-row
+  "If input is inside a table row, returns a 1-based index of its position in that row, nil otherwise"
+  [input]
+  (when-let [parent-cell (find-parent input "td")]
+    (debug input)
+    (debug (index-in-parent parent-cell))
+    (str (inc (index-in-parent parent-cell)))))
+
+(defn label-text-for-input
+  "Return the label text for input based on the for attribute"
+  [input document]
+  (or
+    (get-text (label-from-input-id input document))
+    (get-text (label-nearby input))
+    (position-in-table-row input)))
 
 (defn index-for-input
   "Return the character index for editable password inputs"
   [input document]
-  (let [label (label-for-input input document)
-        text (get-text label)
-        digits (first (re-seq #"\d+" text))
+  (let [text (label-text-for-input input document)
+        digits (first (re-seq #"\d+" (str text)))
         number (js/parseInt digits)]
     (dec number)))
 
@@ -88,7 +117,8 @@
   "Return a map of index => password field with password character indexes as keys"
   [document]
   (->> (find-partial-password-inputs document)
-       (filter #(not= "disabled" (dommy/attr % :disabled)))
+       (remove #(dommy/attr % :disabled))
+       (remove #(dommy/attr % :readonly))
        (map #(vector (index-for-input % document) %))
        (into {})))
 
