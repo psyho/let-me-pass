@@ -81,6 +81,19 @@
   [element tag-name]
   (gdom/getAncestorByTagNameAndClass element tag-name))
 
+(defn partial-password-input?
+  "Checks if element looks like a partial password input"
+  [element]
+  (and
+    (= "password" (dommy/attr element :type))
+    (= "1" (dommy/attr element :maxlength))))
+
+(defn find-partial-password-inputs
+  "Scans the page for inputs that are characteristic to partial passwords"
+  [root]
+  (->> (sel root :input)
+       (filter partial-password-input?)))
+
 (defn index-in-parent
   "Returns a 0 based index of element in its parent node"
   [element]
@@ -94,35 +107,41 @@
   (when-let [parent-cell (find-parent input "td")]
     (str (inc (index-in-parent parent-cell)))))
 
+(defn deepest-individual-ancestor
+  "Returns the most nested ancestor that does not contain multiple partial password inputs"
+  [element]
+  (if-let [parent (dommy/parent element)]
+    (let [inputs (find-partial-password-inputs parent)]
+      (if (< 1 (count inputs))
+        element
+        (recur parent)))))
+
+(defn first-number
+  "Returns first number found in text or nil"
+  [text]
+  (first (re-seq #"\d+" (str text))))
+
+(defn get-text-if-number
+  "Returns element text but only if the text contains a number, otherwise returns nil"
+  [element]
+  (first-number (get-text element)))
+
 (defn label-text-for-input
   "Return the label text for input based on the for attribute"
   [input document]
   (or
-    (get-text (label-from-aria-label input document))
-    (get-text (label-from-input-id input document))
-    (get-text (label-nearby input))
+    (get-text-if-number (label-from-aria-label input document))
+    (get-text-if-number (label-from-input-id input document))
+    (get-text-if-number (label-nearby input))
+    (get-text-if-number (deepest-individual-ancestor input))
     (position-in-table-row input)))
 
 (defn index-for-input
   "Return the character index for editable password inputs"
   [input document]
-  (let [text (label-text-for-input input document)
-        digits (first (re-seq #"\d+" (str text)))
+  (let [digits (label-text-for-input input document)
         number (js/parseInt digits)]
     (dec number)))
-
-(defn partial-password-input?
-  "Checks if element looks like a partial password input"
-  [element]
-  (and
-    (= "password" (dommy/attr element :type))
-    (= "1" (dommy/attr element :maxlength))))
-
-(defn find-partial-password-inputs
-  "Scans the page for inputs that are characteristic to partial passwords"
-  [root]
-  (->> (sel root :input)
-       (filter partial-password-input?)))
 
 (defn build-index-input-map
   "Return a map of index => password field with password character indexes as keys"
