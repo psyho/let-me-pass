@@ -95,11 +95,12 @@
        (filter partial-password-input?)))
 
 (defn index-in-parent
-  "Returns a 0 based index of element in its parent node"
+  "Returns a 0 based index of element in its parent node (includes only nodes of the same type)"
   [element]
   (let [parent (dommy/parent element)
-        children (->Array (dommy/children parent))]
-    (.indexOf children element)))
+        children (->Array (dommy/children parent))
+        children-of-same-type (filter #(= (.-tagName element) (.-tagName %)) children)]
+    (.indexOf children-of-same-type element)))
 
 (defn position-in-table-row
   "If input is inside a table row, returns a 1-based index of its position in that row, nil otherwise"
@@ -133,8 +134,8 @@
     (get-text-if-number (label-from-aria-label input document))
     (get-text-if-number (label-from-input-id input document))
     (get-text-if-number (label-nearby input))
-    (get-text-if-number (deepest-individual-ancestor input))
-    (position-in-table-row input)))
+    (position-in-table-row input)
+    (get-text-if-number (deepest-individual-ancestor input))))
 
 (defn index-for-input
   "Return the character index for editable password inputs"
