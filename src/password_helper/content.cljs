@@ -53,6 +53,12 @@
       (console/warn e)
       nil)))
 
+(defn label-from-aria-label
+  "Returns the label element based on the aria-labelledby attribute of the input"
+  [input document]
+  (if-let [label-id (dommy/attr input :aria-labelledby)]
+    (try-find (.-body document) (str "#" label-id))))
+
 (defn label-from-input-id
   "If input has an ID try to look up label for it based on the for attribute"
   [input document]
@@ -92,6 +98,7 @@
   "Return the label text for input based on the for attribute"
   [input document]
   (or
+    (get-text (label-from-aria-label input document))
     (get-text (label-from-input-id input document))
     (get-text (label-nearby input))
     (position-in-table-row input)))
