@@ -11,6 +11,7 @@
   :profiles {:dev
              {:plugins [[com.cemerick/austin "0.1.6"]
                         [lein-cljsbuild "1.1.7"]
+                        [lein-eftest "0.4.2"]
                         [lein-chromebuild "0.3.0"]]
               :cljsbuild
                        {:builds
