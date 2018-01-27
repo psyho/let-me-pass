@@ -189,9 +189,9 @@
 
 (defn maintain-input-focus
   "Don't let the password input lose focus until after user stops typing (500ms after last key press)"
-  []
+  [document]
   (let [last-keypress-time (atom (js/Date. 0))
-        input (sel1 :#password-helper-input)
+        input (sel1 document :#password-helper-input)
         update-keypress-time #(reset! last-keypress-time (js/Date.))
         elapsed-since-last-keypress #(- (.getTime (js/Date.)) (.getTime @last-keypress-time))]
     (dommy/listen! input :keydown update-keypress-time :keyup update-keypress-time)
@@ -229,7 +229,7 @@
     (debug "Injecting Password Helper")
     (inject-html document)
     (listen-for-input-changes document)
-    (maintain-input-focus)))
+    (maintain-input-focus document)))
 
 (defn remove-password-helper
   "Removes password helper input from the page, if added"

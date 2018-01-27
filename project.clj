@@ -25,4 +25,7 @@
                                      :closure-output-charset "US-ASCII"
                                      :pretty-print true}}}}
               :chromebuild {:resource-paths ["resources/js" "resources/css" "resources/images"]
-                            :target-path "target/unpacked"}}})
+                            :target-path "target/unpacked"}
+
+              :eftest {:multithread? false}
+              }})
