@@ -12,7 +12,9 @@
   "Executes a test running a driver. Binds a driver
    with the global *driver* variable."
   [f]
-  (with-chrome {:args [(str "--load-extension=" project-dir "/target/unpacked")]} driver
+  (with-chrome {:args [(str "--load-extension=" project-dir "/target/unpacked")]
+                :port (+ 19999 (rand-int 1000))}
+               driver
                (binding [*driver* driver]
                  (f))))
 
