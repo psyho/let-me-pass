@@ -20,6 +20,13 @@
   :each ;; start and stop driver for each test
   fixture-driver)
 
+(defn idx-from-input
+  "Returns the index corresponding to the password input"
+  [input]
+  (let [id (get-element-attr-el *driver* input :id)
+        number (re-find #"\d+" id)]
+    (dec (Integer/parseInt number))))
+
 (deftest ing
   (go *driver* "https://login.ingbank.pl/")
   (wait-visible *driver* {:id :login-input})
@@ -28,9 +35,9 @@
   (click *driver* [{:id :js-login-form} {:tag :button}])
   (wait-visible *driver* {:id :password-helper-input})
   (fill *driver* {:id :password-helper-input} password)
-  (let [idx (first (filter #(visible? *driver* {:id (str "mask-" (inc %))}) (range)))
-        input-id (str "mask-" (inc idx))
-        char (str (nth password idx))]
-    (is (= char (get-element-value *driver* {:id input-id})))
-    ))
+  (let [password-inputs (query-all *driver* {:tag :input :type :password :maxlength 1})]
+    (doseq [input password-inputs]
+      (let [idx (idx-from-input input)
+            char (str (nth password idx))]
+        (is (= char (get-element-value-el *driver* input)))))))
 
