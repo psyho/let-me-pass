@@ -51,6 +51,14 @@
          first
          first)))
 
+(defn idx-from-aria-label
+  "Returns the inputs idx based on the label for the input"
+  [input]
+  (let [id (get-element-attr-el *driver* input :aria-labelledby)
+        label (query *driver* {:id id})
+        text (get-element-text-el *driver* label)]
+    (dec (Integer/parseInt text))))
+
 (defn verify-typing-input-via-helper [{:keys [login-url
                                               login-selector
                                               valid-login
@@ -126,3 +134,10 @@
                                    :login-selector {:id :login_id}
                                    :submit-login-selector {:tag :img :alt "dalej" :title "dalej"}
                                    :idx-from-input #(idx-from-input-based-on-attr % :id identity)}))
+
+(deftest bz-wbk
+  (verify-typing-input-via-helper {:login-url             "https://www.centrum24.pl/centrum24-web/login"
+                                   :valid-login           "12312312"
+                                   :login-selector        {:id :input_nik}
+                                   :submit-login-selector {:tag :input :name "loginButton"}
+                                   :idx-from-input        idx-from-aria-label}))
