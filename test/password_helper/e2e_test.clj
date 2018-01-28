@@ -147,3 +147,10 @@
                                    :login-selector        {:id :user-alias}
                                    :submit-login-selector {:tag :input :type :submit :value "DALEJ"}
                                    :idx-from-input        #(idx-from-input-based-on-attr % :data-password-field-number dec)}))
+
+(deftest idea-bank
+  (verify-typing-input-via-helper {:login-url             "https://secure.ideabank.pl/"
+                                   :valid-login           "123123"
+                                   :login-selector        {:id :log}
+                                   :submit-login-selector {:tag :button :type :submit :class "dalej1"}
+                                   :idx-from-input        #(idx-from-input-based-on-attr % :id identity)}))
