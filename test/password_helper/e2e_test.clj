@@ -150,7 +150,14 @@
 
 (deftest idea-bank
   (verify-typing-input-via-helper {:login-url             "https://secure.ideabank.pl/"
-                                   :valid-login           "123123"
+                                   :valid-login           "111222"
                                    :login-selector        {:id :log}
                                    :submit-login-selector {:tag :button :type :submit :class "dalej1"}
                                    :idx-from-input        #(idx-from-input-based-on-attr % :id identity)}))
+
+(deftest getin-bank
+  (verify-typing-input-via-helper {:login-url             "https://secure.getinbank.pl"
+                                   :valid-login           "111222"
+                                   :login-selector        {:tag :input :name :login}
+                                   :submit-login-selector {:tag :button :type :submit}
+                                   :idx-from-input        #(idx-from-input-based-on-attr % :name identity)}))
