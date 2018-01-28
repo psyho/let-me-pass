@@ -6,7 +6,7 @@
 
 (def project-dir (System/getProperty "user.dir"))
 
-(def password "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+(def password "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 (defn fixture-driver
   "Executes a test running a driver. Binds a driver
@@ -41,6 +41,16 @@
   [input]
   (idx-from-input-based-on-attr input :name))
 
+(defn idx-from-position-among-other-inputs
+  "Returns the inputs position in a table row as the index"
+  [input]
+  (let [inputs (query-all *driver* {:tag :input :type :password :maxlength 1})]
+    (->> inputs
+         (map-indexed vector)
+         (filter #(= (second %) input))
+         first
+         first)))
+
 (defn verify-typing-input-via-helper [{:keys [login-url
                                               login-selector
                                               valid-login
@@ -68,7 +78,7 @@
     (doseq [input password-inputs]
       (let [idx (idx-from-input input)
             char (str (nth password idx))]
-        (is (= char (get-element-value-el *driver* input))))))
+        (is (= char (get-element-value-el *driver* input)) (str "idx=" idx " char=" char " input=" input)))))
   (after-fill-password))
 
 (deftest ing
@@ -104,3 +114,9 @@
                                    :login-selector {:id :parUsername}
                                    :submit-login-selector {:id :butLogin}
                                    :idx-from-input #(idx-from-input-based-on-attr % :id identity)}))
+
+(deftest bgz-pnb-paribas
+  (verify-typing-input-via-helper {:login-url "https://planet.bgzbnpparibas.pl/hades/ver/pl/demo_smart_planet/index2.html"
+                                   :login-selector {:class :login-input}
+                                   :submit-login-selector {:tag :input :type :submit :class :greenButton}
+                                   :idx-from-input idx-from-position-among-other-inputs}))
