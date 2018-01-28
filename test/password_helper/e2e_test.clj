@@ -141,3 +141,9 @@
                                    :login-selector        {:id :input_nik}
                                    :submit-login-selector {:tag :input :name "loginButton"}
                                    :idx-from-input        idx-from-aria-label}))
+
+(deftest envelo-bank
+  (verify-typing-input-via-helper {:login-url             "https://online.envelobank.pl/login/main"
+                                   :login-selector        {:id :user-alias}
+                                   :submit-login-selector {:tag :input :type :submit :value "DALEJ"}
+                                   :idx-from-input        #(idx-from-input-based-on-attr % :data-password-field-number dec)}))

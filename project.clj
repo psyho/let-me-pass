@@ -29,4 +29,5 @@
               :chromebuild {:resource-paths ["resources/js" "resources/css" "resources/images"]
                             :target-path "target/unpacked"}
 
+              :eftest {:multithread? false}
               }})
