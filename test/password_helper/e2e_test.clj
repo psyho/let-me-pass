@@ -120,3 +120,9 @@
                                    :login-selector {:class :login-input}
                                    :submit-login-selector {:tag :input :type :submit :class :greenButton}
                                    :idx-from-input idx-from-position-among-other-inputs}))
+
+(deftest bos-bank
+  (verify-typing-input-via-helper {:login-url "https://bosbank24.pl/twojekonto"
+                                   :login-selector {:id :login_id}
+                                   :submit-login-selector {:tag :img :alt "dalej" :title "dalej"}
+                                   :idx-from-input #(idx-from-input-based-on-attr % :id identity)}))
