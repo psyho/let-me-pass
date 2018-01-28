@@ -22,10 +22,14 @@
   :each ;; start and stop driver for each test
   fixture-driver)
 
-(defn idx-from-input-based-on-attr [input attr]
-  (let [id (get-element-attr-el *driver* input attr)
-        number (re-find #"\d+" id)]
-    (dec (Integer/parseInt number))))
+(defn idx-from-input-based-on-attr
+  ([input attr]
+    (idx-from-input-based-on-attr input attr dec))
+
+  ([input attr adjust-fn]
+   (let [id (get-element-attr-el *driver* input attr)
+         number (re-find #"\d+" id)]
+     (adjust-fn (Integer/parseInt number)))))
 
 (defn idx-from-input-id
   "Returns the index corresponding to the password input, based on ID attribute"
@@ -95,3 +99,8 @@
                                                           (let [password-submit-btn (query *driver* {:id :password-submit})
                                                                 disabled (get-element-attr-el *driver* password-submit-btn :disabled)]
                                                             (is (nil? disabled))))}))
+(deftest pekao
+  (verify-typing-input-via-helper {:login-url "http://demo.pekao24.pl/"
+                                   :login-selector {:id :parUsername}
+                                   :submit-login-selector {:id :butLogin}
+                                   :idx-from-input #(idx-from-input-based-on-attr % :id identity)}))
