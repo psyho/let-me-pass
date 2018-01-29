@@ -10,6 +10,7 @@
     {
       "matches": ["*://*/*"],
       "js": ["password_helper.js", "content.js"],
+      "css": ["password_helper.css"],
       "run_at": "document_end"
     }
   ],

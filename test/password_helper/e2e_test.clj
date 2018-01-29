@@ -59,6 +59,12 @@
         text (get-element-text-el *driver* label)]
     (dec (Integer/parseInt text))))
 
+(defn idx-from-sibling-label
+  [input]
+  (-> (js-execute *driver* "return arguments[0].parentElement.querySelector(\"label\").innerText;" (el->ref input))
+      Integer/parseInt
+      dec))
+
 (defn verify-typing-input-via-helper [{:keys [login-url
                                               login-selector
                                               valid-login
@@ -150,7 +156,7 @@
 
 (deftest idea-bank
   (verify-typing-input-via-helper {:login-url             "https://secure.ideabank.pl/"
-                                   :valid-login           "111222"
+                                   :valid-login           (str (+ 100000 (rand-int 900000)))
                                    :login-selector        {:id :log}
                                    :submit-login-selector {:tag :button :type :submit :class "dalej1"}
                                    :idx-from-input        #(idx-from-input-based-on-attr % :id identity)}))
@@ -161,3 +167,10 @@
                                    :login-selector        {:tag :input :name :login}
                                    :submit-login-selector {:tag :button :type :submit}
                                    :idx-from-input        #(idx-from-input-based-on-attr % :name identity)}))
+
+(deftest tmobile-bank
+  (verify-typing-input-via-helper {:login-url             "https://system.t-mobilebankowe.pl/web/login"
+                                   :valid-login           "123123"
+                                   :login-selector        {:tag :input :type :text :maxlength 100}
+                                   :submit-login-selector [{:class "RjVxsd"} {:tag :button}]
+                                   :idx-from-input        idx-from-sibling-label}))
