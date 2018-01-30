@@ -126,7 +126,10 @@
 (defn first-number
   "Returns first number found in text or nil"
   [text]
-  (first (re-seq #"\d+" (str text))))
+  (cond
+    (re-find #"(?i)second.+last" (str text)) "-1"
+    (re-find #"(?i)last" (str text)) "0"
+    :else (first (re-seq #"\d+" (str text)))))
 
 (defn get-text-if-number
   "Returns element text but only if the text contains a number, otherwise returns nil"

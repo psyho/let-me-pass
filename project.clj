@@ -13,18 +13,27 @@
              {:plugins [[com.cemerick/austin "0.1.6"]
                         [lein-cljsbuild "1.1.7"]
                         [lein-eftest "0.4.2"]
+                        [lein-doo "0.1.8"]
                         [lein-chromebuild "0.3.0"]]
 
               :cljsbuild
                        {:builds
-                        {:main
-                         {:source-paths ["src"]
-                          :compiler {:output-to "target/unpacked/password_helper.js"
-                                     :output-dir "target/unpacked"
-                                     :optimizations :whitespace
-                                     :source-map "target/unpacked/password_helper.js.map"
-                                     :closure-output-charset "US-ASCII"
-                                     :pretty-print true}}}}
+                        {:main {:source-paths ["src"]
+                                :compiler {:output-to "target/unpacked/password_helper.js"
+                                           :output-dir "target/unpacked"
+                                           :optimizations :whitespace
+                                           :source-map "target/unpacked/password_helper.js.map"
+                                           :closure-output-charset "US-ASCII"
+                                           :pretty-print true}}
+
+                         :test {:source-paths ["src" "test"]
+                                :compiler {:output-to "target/test/password_helper_test.js"
+                                           :output-dir "target/test"
+                                           :main password-helper.runner
+                                           :optimizations :whitespace
+                                           :source-map "target/test/password_helper_test.js.map"
+                                           :closure-output-charset "US-ASCII"
+                                           :pretty-print true}}}}
 
               :chromebuild {:resource-paths ["resources/js" "resources/css" "resources/images"]
                             :target-path "target/unpacked"}

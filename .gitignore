@@ -1,3 +1,4 @@
 .idea
 password-helper.iml
 target
+node_modules
