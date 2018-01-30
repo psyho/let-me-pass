@@ -44,14 +44,20 @@
   (inject-stylesheet document)
   (inject-password-helper-box document))
 
-(defn try-find
-  "Tries to select the element, hides exceptions"
-  [element selector]
+(defn ignore-errors
+  "Executes the given function and ignores errors thrown (logs them to console)"
+  [f]
   (try
-    (sel1 element selector)
+    (f)
     (catch :default e
       (console/warn e)
       nil)))
+
+(defn try-find
+  "Tries to select the element, hides exceptions"
+  [element selector]
+  (ignore-errors
+    #(sel1 element selector)))
 
 (defn label-from-aria-label
   "Returns the label element based on the aria-labelledby attribute of the input"
@@ -201,7 +207,10 @@
 (defn frame-documents
   "Returns document objects for all frames found in document"
   [document]
-  (letfn [(content-documents [tag] (map #(.-contentDocument %) (->Array (sel document tag))))]
+  (letfn [(content-documents [tag]
+            (->> (->Array (sel document tag))
+                 (map (fn [frame] (ignore-errors #(.-contentDocument frame))))
+                 (remove nil?)))]
     (concat
       (content-documents :frame)
       (content-documents :iframe))))
