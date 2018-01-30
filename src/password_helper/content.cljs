@@ -179,6 +179,14 @@
                                                                   :value value}})]
     (.dispatchEvent input event)))
 
+(defn at-index
+  "Returns character at index or empty string"
+  [string idx]
+  (let [positive-idx (if (< idx 0)
+                       (+ (count string) idx)
+                       idx)]
+    (get string positive-idx "")))
+
 (defn on-input-change
   "This function is called whenever the password input changes with the new password value"
   [password input-map]
