@@ -52,7 +52,7 @@
          first)))
 
 (defn idx-from-aria-label
-  "Returns the inputs idx based on the label for the input"
+  "Returns the inputs idx based on the label for the input (uses aria)"
   [input]
   (let [id (get-element-attr-el *driver* input :aria-labelledby)
         label (query *driver* {:id id})
@@ -64,6 +64,14 @@
   (-> (js-execute *driver* "return arguments[0].parentElement.querySelector(\"label\").innerText;" (el->ref input))
       Integer/parseInt
       dec))
+
+(defn hsbc-adjust
+  "In HSBC, input 8 is last character and input 7 is second last"
+  [password number]
+  (condp = number
+    7 (- (count password) 2)
+    8 (- (count password) 1)
+    (dec number)))
 
 (defn verify-typing-input-via-helper [{:keys [login-url
                                               login-selector
@@ -174,3 +182,13 @@
                                    :login-selector        {:tag :input :type :text :maxlength 100}
                                    :submit-login-selector [{:class "RjVxsd"} {:tag :button}]
                                    :idx-from-input        idx-from-sibling-label}))
+
+(deftest hsbc-uk
+  (verify-typing-input-via-helper {:login-url             "https://www.hsbc.co.uk/1/2/welcome-gsp?initialAccess=true&IDV_URL=hsbc.MyHSBC_pib"
+                                   :valid-login           "John123"
+                                   :login-selector        {:id "Username1"}
+                                   :submit-login-selector {:tag :input :type :submit :class :submit_input}
+                                   :before-fill-password (fn []
+                                                           (wait-visible *driver* {:css ".toggleButtons"})
+                                                           (click *driver* [{:css ".toggleButtons"} {:tag :li :aria-checked :false}]))
+                                   :idx-from-input        #(idx-from-input-based-on-attr % :id (partial hsbc-adjust password))}))
