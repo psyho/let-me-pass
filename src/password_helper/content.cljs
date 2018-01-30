@@ -143,8 +143,8 @@
     (get-text-if-number (label-from-aria-label input document))
     (get-text-if-number (label-from-input-id input document))
     (get-text-if-number (label-nearby input))
-    (position-in-table-row input)
-    (get-text-if-number (deepest-individual-ancestor input))))
+    (get-text-if-number (deepest-individual-ancestor input))
+    (position-in-table-row input)))
 
 (defn index-for-input
   "Return the character index for editable password inputs"

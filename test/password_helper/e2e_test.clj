@@ -65,6 +65,13 @@
       Integer/parseInt
       dec))
 
+(defn idx-from-parent-text
+  [input]
+  (->> (js-execute *driver* "return arguments[0].parentElement.innerText;" (el->ref input))
+       (re-find #"\d+")
+       Integer/parseInt
+       dec))
+
 (defn hsbc-adjust
   "In HSBC, input 8 is last character and input 7 is second last"
   [password number]
@@ -192,3 +199,10 @@
                                                            (wait-visible *driver* {:css ".toggleButtons"})
                                                            (click *driver* [{:css ".toggleButtons"} {:tag :li :aria-checked :false}]))
                                    :idx-from-input        #(idx-from-input-based-on-attr % :id (partial hsbc-adjust password))}))
+
+(deftest alliance-trust-savings
+  (verify-typing-input-via-helper {:login-url             "https://atonline.alliancetrust.co.uk/atonline/login.jsp"
+                                   :valid-login           "123123"
+                                   :login-selector        {:id :pinId}
+                                   :submit-login-selector [{:tag :form :name :login} {:tag :input :type :submit}]
+                                   :idx-from-input        idx-from-parent-text}))
