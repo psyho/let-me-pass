@@ -194,12 +194,16 @@
   (doseq [[idx input] input-map]
     (simulate-user-input input (get password idx ""))))
 
+(defn find-password-helper-input
+  "Finds the password helper input element or returns nil"
+  [document]
+  (sel1 document :#password-helper-input))
+
 (defn listen-for-input-changes
   "Registers event handler to listen to input changes on the password input"
   [document]
-  (let [body (.-body document)
-        input-map (build-index-input-map document)
-        input (sel1 body :#password-helper-input)
+  (let [input-map (build-index-input-map document)
+        input (find-password-helper-input document)
         handler (fn [event] (on-input-change (dommy/value input) input-map))]
     (debug "Registering change handler")
     (dommy/listen! input :input handler)))
@@ -208,7 +212,7 @@
   "Don't let the password input lose focus until after user stops typing (500ms after last key press)"
   [document]
   (let [last-keypress-time (atom (js/Date. 0))
-        input (sel1 document :#password-helper-input)
+        input (find-password-helper-input document)
         update-keypress-time #(reset! last-keypress-time (js/Date.))
         elapsed-since-last-keypress #(- (.getTime (js/Date.)) (.getTime @last-keypress-time))]
     (dommy/listen! input :keydown update-keypress-time :keyup update-keypress-time)
@@ -242,10 +246,15 @@
   []
   (first (filter #(seq (find-partial-password-inputs %)) (all-frame-docs))))
 
+(defn find-password-helper-box
+  "Finds the password helper box in the page or returns nil"
+  [document]
+  (sel1 document :#password-helper-box))
+
 (defn start-password-helper
   "Start Password Helper on the page (add HTML, register event handlers, etc)"
   [document]
-  (when-not (sel1 :#password-helper-box)
+  (when-not (find-password-helper-box document)
     (debug "Injecting Password Helper")
     (inject-html document)
     (listen-for-input-changes document)
@@ -254,8 +263,9 @@
 (defn remove-password-helper
   "Removes password helper input from the page, if added"
   []
-  (if-let [elem (sel1 :#password-helper-box)]
-    (dommy/remove! elem)))
+  (doseq [document (all-frame-docs)]
+    (if-let [elem (find-password-helper-box document)]
+      (dommy/remove! elem))))
 
 (defn listen-for-page-changes
   "If any change in DOM happens, checks if it seems like the page contains partial password and adds password helper in such case"
