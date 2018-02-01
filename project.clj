@@ -7,6 +7,7 @@
                  [khroma "0.3.0"]
                  [hipo "0.5.2"]
                  [etaoin "0.2.4"]
+                 [doo "0.1.8"]
                  [prismatic/dommy "1.1.0"]]
   :source-paths ["src"]
   :profiles {:dev

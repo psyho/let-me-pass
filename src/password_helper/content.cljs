@@ -166,7 +166,7 @@
   "Returns the id of the given input, if input has no ID, then assigns a random one to it"
   [input]
   (when-not (dommy/attr input :id)
-    (dommy/set-attr! input :id (random-uuid)))
+    (dommy/set-attr! input :id (str "pass-" (random-uuid))))
   (dommy/attr input :id))
 
 (defn simulate-user-input
@@ -193,6 +193,11 @@
   (debug (str "Password changed to " \" password \"))
   (doseq [[idx input] input-map]
     (simulate-user-input input (get password idx ""))))
+
+(defn find-password-helper-root
+  "Finds the password helper box in the page or returns nil"
+  [document]
+  (sel1 document :#password-helper-box))
 
 (defn find-password-helper-input
   "Finds the password helper input element or returns nil"
@@ -246,15 +251,10 @@
   []
   (first (filter #(seq (find-partial-password-inputs %)) (all-frame-docs))))
 
-(defn find-password-helper-box
-  "Finds the password helper box in the page or returns nil"
-  [document]
-  (sel1 document :#password-helper-box))
-
 (defn start-password-helper
   "Start Password Helper on the page (add HTML, register event handlers, etc)"
   [document]
-  (when-not (find-password-helper-box document)
+  (when-not (find-password-helper-root document)
     (debug "Injecting Password Helper")
     (inject-html document)
     (listen-for-input-changes document)
@@ -264,7 +264,7 @@
   "Removes password helper input from the page, if added"
   []
   (doseq [document (all-frame-docs)]
-    (if-let [elem (find-password-helper-box document)]
+    (if-let [elem (find-password-helper-root document)]
       (dommy/remove! elem))))
 
 (defn listen-for-page-changes
