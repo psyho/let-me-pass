@@ -10,11 +10,11 @@
     {
       "matches": ["*://*/*"],
       "js": ["password_helper.js", "content.js"],
-      "css": ["password_helper.css"],
+      "css": ["password_helper.css", "uikit.min.css"],
       "run_at": "document_end"
     }
   ],
-  "web_accessible_resources": ["password_helper.css", "simulate_input.js"],
+  "web_accessible_resources": ["password_helper.css", "uikit.min.css", "simulate_input.js"],
   "manifest_version": 2
 }
 

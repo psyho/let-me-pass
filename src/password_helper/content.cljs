@@ -15,10 +15,14 @@
 (defn password-helper-box
   "The main HTML element injected into the page"
   []
-  [:div#password-helper-box
+  [:div#password-helper-box.password-helper-container
+
    ;; needed to hack around the fact that Chrome has broken KeyboardEvents that don't accept keyCode and which
    [:script {:type "text/javascript" :src (extension/get-url "simulate_input.js")}]
-   [:input {:type "password" :placeholder "Password Helper" :id "password-helper-input"}]])
+
+   [:div.uk-card.uk-card-small.uk-card-primary.uk-card-body.uk-animation-slide-right
+    [:div.uk-card-title.uk-h3 "Password Helper"]
+    [:input.uk-input {:type "password" :placeholder "Enter your full password here" :id "password-helper-input"}]]])
 
 (defn inject-password-helper-box
   "Injects password helper HTML element into the current page"
@@ -31,17 +35,26 @@
   []
   [:link {:type "text/css" :rel "stylesheet" :href (extension/get-url "password_helper.css")}])
 
-(defn inject-stylesheet
+(defn uikit-stylesheet
+  "Link to the uikit stylesheet"
+  []
+  [:link {:type "text/css" :rel "stylesheet" :href (extension/get-url "uikit.min.css")}])
+
+(defn append-stylesheet [document html]
+  "Append stylesheet tag to head element"
+  (.appendChild (.-head document) (hipo/create html)))
+
+(defn inject-stylesheets
   "Injects password helper CSS into document HEAD"
   [document]
-  (.appendChild (.-head document)
-                (hipo/create (password-helper-stylesheet))))
+  (append-stylesheet document (password-helper-stylesheet))
+  (append-stylesheet document (uikit-stylesheet)))
 
 (defn inject-html
   "Injects password helper HTML and stylesheet into the page"
   [document]
   (debug "Injecting Password Helper HTML")
-  (inject-stylesheet document)
+  (inject-stylesheets document)
   (inject-password-helper-box document))
 
 (defn ignore-errors
