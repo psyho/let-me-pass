@@ -13,6 +13,15 @@
   [message]
   (if debugging (console/log message)))
 
+
+(defn input-id!
+  "Returns the id of the given input, if input has no ID, then assigns a random one to it"
+  [input]
+  (when-not (dommy/attr input :id)
+    (dommy/set-attr! input :id (str "pass-" (random-uuid))))
+  (dommy/attr input :id))
+
+
 (defn simulate-user-input
   "Simulates user typing into an input"
   [input value]
@@ -218,13 +227,6 @@
        (remove #(dommy/attr % :readonly))
        (map #(vector (index-for-input % document) %))
        (into {})))
-
-(defn input-id!
-  "Returns the id of the given input, if input has no ID, then assigns a random one to it"
-  [input]
-  (when-not (dommy/attr input :id)
-    (dommy/set-attr! input :id (str "pass-" (random-uuid))))
-  (dommy/attr input :id))
 
 (defn at-index
   "Returns character at index or empty string"
