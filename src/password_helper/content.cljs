@@ -13,12 +13,38 @@
   [message]
   (if debugging (console/log message)))
 
+(defn simulate-user-input
+  "Simulates user typing into an input"
+  [input value]
+  ;; see simulate_input.js for the part that listens to this event and triggers actual events on the input
+  (let [event (js/CustomEvent. "simulate-input" #js {:bubbles true
+                                                     :cancelable true
+                                                     :detail #js {:id (input-id! input)
+                                                                  :value value}})]
+    (.dispatchEvent input event)))
+
+(defn on-input-change
+  "This function is called whenever the password input changes with the new password value"
+  [password input-map]
+  (debug (str "Password changed to " \" password \"))
+  (doseq [[idx input] input-map]
+    (simulate-user-input input (get password idx ""))))
+
+
 (defn password-helper-app-root
   "This is the react root component for the password helper"
-  []
-  [:div.uk-card.uk-card-small.uk-card-primary.uk-card-body.uk-animation-slide-right
-    [:div.uk-card-title.uk-h3 "Password Helper"]
-    [:input.uk-input {:type "password" :placeholder "Enter your full password here" :id "password-helper-input"}]])
+  [input-map]
+  (let [password (r/atom "")]
+    (fn []
+      [:div.uk-card.uk-card-small.uk-card-primary.uk-card-body.uk-animation-slide-right
+       [:div.uk-card-title.uk-h3 "Password Helper"]
+       [:input.uk-input {:type "password"
+                         :placeholder "Enter your full password here"
+                         :value @password
+                         :on-input #(do
+                                      (reset! password (-> % .-target .-value))
+                                      (on-input-change @password input-map))
+                         :id "password-helper-input"}]])))
 
 (defn password-helper-box
   "The main HTML element injected into the page"
@@ -32,11 +58,11 @@
 
 (defn inject-password-helper-box
   "Injects password helper HTML element into the current page"
-  [document]
+  [document input-map]
   (.appendChild (.-body document)
                 (hipo/create (password-helper-box)))
   (let [app-root (sel1 document :#password-helper-app-root)]
-    (r/render [password-helper-app-root] app-root)))
+    (r/render [password-helper-app-root input-map] app-root)))
 
 (defn password-helper-stylesheet
   "Link to the extension stylesheet"
@@ -60,10 +86,10 @@
 
 (defn inject-html
   "Injects password helper HTML and stylesheet into the page"
-  [document]
+  [document input-map]
   (debug "Injecting Password Helper HTML")
   (inject-stylesheets document)
-  (inject-password-helper-box document))
+  (inject-password-helper-box document input-map))
 
 (defn ignore-errors
   "Executes the given function and ignores errors thrown (logs them to console)"
@@ -190,16 +216,6 @@
     (dommy/set-attr! input :id (str "pass-" (random-uuid))))
   (dommy/attr input :id))
 
-(defn simulate-user-input
-  "Simulates user typing into an input"
-  [input value]
-  ;; see simulate_input.js for the part that listens to this event and triggers actual events on the input
-  (let [event (js/CustomEvent. "simulate-input" #js {:bubbles true
-                                                     :cancelable true
-                                                     :detail #js {:id (input-id! input)
-                                                                  :value value}})]
-    (.dispatchEvent input event)))
-
 (defn at-index
   "Returns character at index or empty string"
   [string idx]
@@ -208,12 +224,6 @@
                        idx)]
     (get string positive-idx "")))
 
-(defn on-input-change
-  "This function is called whenever the password input changes with the new password value"
-  [password input-map]
-  (debug (str "Password changed to " \" password \"))
-  (doseq [[idx input] input-map]
-    (simulate-user-input input (get password idx ""))))
 
 (defn find-password-helper-root
   "Finds the password helper box in the page or returns nil"
@@ -224,15 +234,6 @@
   "Finds the password helper input element or returns nil"
   [document]
   (sel1 document :#password-helper-input))
-
-(defn listen-for-input-changes
-  "Registers event handler to listen to input changes on the password input"
-  [document]
-  (let [input-map (build-index-input-map document)
-        input (find-password-helper-input document)
-        handler (fn [event] (on-input-change (dommy/value input) input-map))]
-    (debug "Registering change handler")
-    (dommy/listen! input :input handler)))
 
 (defn maintain-input-focus
   "Don't let the password input lose focus until after user stops typing (500ms after last key press)"
@@ -277,8 +278,7 @@
   [document]
   (when-not (find-password-helper-root document)
     (debug "Injecting Password Helper")
-    (inject-html document)
-    (listen-for-input-changes document)
+    (inject-html document (build-index-input-map document))
     (maintain-input-focus document)))
 
 (defn remove-password-helper
