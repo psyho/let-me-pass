@@ -8,6 +8,7 @@
                  [hipo "0.5.2"]
                  [etaoin "0.2.4"]
                  [doo "0.1.8"]
+                 [reagent "0.8.0-alpha2"]
                  [prismatic/dommy "1.1.0"]]
   :source-paths ["src"]
   :profiles {:dev

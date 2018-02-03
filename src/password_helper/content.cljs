@@ -2,6 +2,7 @@
   (:require [khroma.log :as console]
             [khroma.extension :as extension]
             [goog.dom :as gdom]
+            [reagent.core :as r]
             [dommy.core :as dommy :refer-macros [sel1 sel]]
             [dommy.utils :refer [->Array]]
             [hipo.core :as hipo]))
@@ -12,6 +13,13 @@
   [message]
   (if debugging (console/log message)))
 
+(defn password-helper-app-root
+  "This is the react root component for the password helper"
+  []
+  [:div.uk-card.uk-card-small.uk-card-primary.uk-card-body.uk-animation-slide-right
+    [:div.uk-card-title.uk-h3 "Password Helper"]
+    [:input.uk-input {:type "password" :placeholder "Enter your full password here" :id "password-helper-input"}]])
+
 (defn password-helper-box
   "The main HTML element injected into the page"
   []
@@ -20,15 +28,15 @@
    ;; needed to hack around the fact that Chrome has broken KeyboardEvents that don't accept keyCode and which
    [:script {:type "text/javascript" :src (extension/get-url "simulate_input.js")}]
 
-   [:div.uk-card.uk-card-small.uk-card-primary.uk-card-body.uk-animation-slide-right
-    [:div.uk-card-title.uk-h3 "Password Helper"]
-    [:input.uk-input {:type "password" :placeholder "Enter your full password here" :id "password-helper-input"}]]])
+   [:div#password-helper-app-root]])
 
 (defn inject-password-helper-box
   "Injects password helper HTML element into the current page"
   [document]
   (.appendChild (.-body document)
-                (hipo/create (password-helper-box))))
+                (hipo/create (password-helper-box)))
+  (let [app-root (sel1 document :#password-helper-app-root)]
+    (r/render [password-helper-app-root] app-root)))
 
 (defn password-helper-stylesheet
   "Link to the extension stylesheet"
