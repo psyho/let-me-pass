@@ -34,16 +34,26 @@
 (defn password-helper-app-root
   "This is the react root component for the password helper"
   [input-map]
-  (let [password (r/atom "")]
+  (let [password (r/atom "")
+        update-password #(do
+                           (reset! password (-> % .-target .-value))
+                           (on-input-change @password input-map))
+
+        last-keypress-time (atom (js/Date. 0))
+        update-keypress-time #(reset! last-keypress-time (js/Date.))
+        elapsed-since-last-keypress #(- (.getTime (js/Date.)) (.getTime @last-keypress-time))
+        maintain-focus #(if (< (elapsed-since-last-keypress) 500)
+                          (.focus (.-target %)))]
     (fn []
       [:div.uk-card.uk-card-small.uk-card-primary.uk-card-body.uk-animation-slide-right
        [:div.uk-card-title.uk-h3 "Password Helper"]
        [:input.uk-input {:type "password"
                          :placeholder "Enter your full password here"
                          :value @password
-                         :on-input #(do
-                                      (reset! password (-> % .-target .-value))
-                                      (on-input-change @password input-map))
+                         :on-input update-password
+                         :on-key-down update-keypress-time
+                         :on-key-up update-keypress-time
+                         :on-blur maintain-focus
                          :id "password-helper-input"}]])))
 
 (defn password-helper-box
@@ -230,22 +240,6 @@
   [document]
   (sel1 document :#password-helper-box))
 
-(defn find-password-helper-input
-  "Finds the password helper input element or returns nil"
-  [document]
-  (sel1 document :#password-helper-input))
-
-(defn maintain-input-focus
-  "Don't let the password input lose focus until after user stops typing (500ms after last key press)"
-  [document]
-  (let [last-keypress-time (atom (js/Date. 0))
-        input (find-password-helper-input document)
-        update-keypress-time #(reset! last-keypress-time (js/Date.))
-        elapsed-since-last-keypress #(- (.getTime (js/Date.)) (.getTime @last-keypress-time))]
-    (dommy/listen! input :keydown update-keypress-time :keyup update-keypress-time)
-    (dommy/listen! input :blur #(if (< (elapsed-since-last-keypress) 500)
-                                  (.focus input)))))
-
 (defn frame-documents
   "Returns document objects for all frames found in document"
   [document]
@@ -278,8 +272,7 @@
   [document]
   (when-not (find-password-helper-root document)
     (debug "Injecting Password Helper")
-    (inject-html document (build-index-input-map document))
-    (maintain-input-focus document)))
+    (inject-html document (build-index-input-map document))))
 
 (defn remove-password-helper
   "Removes password helper input from the page, if added"
