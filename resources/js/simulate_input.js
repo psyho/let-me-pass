@@ -50,6 +50,7 @@
     }
 
     document.addEventListener("simulate-input", function (event) {
+        // console.log('Sending key "' + event.detail.value + '" to input "' + event.detail.id + '"');
         simulateInput(document.getElementById(event.detail.id), event.detail.value);
     });
 })();

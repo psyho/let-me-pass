@@ -6,7 +6,7 @@
 
 (def project-dir (System/getProperty "user.dir"))
 
-(def password "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+(def password "1234567890abcdefghij")
 
 (defn fixture-driver
   "Executes a test running a driver. Binds a driver
@@ -80,6 +80,16 @@
     8 (- (count password) 1)
     (dec number)))
 
+(defn verify-password-input-values [idx-from-input]
+  (let [password-inputs
+        (->> (query-all *driver* {:tag :input :type :password :maxlength 1})
+             (remove #(get-element-attr-el *driver* % :readonly))
+             (remove #(get-element-attr-el *driver* % :disabled)))]
+    (for [input password-inputs]
+      (let [idx (idx-from-input input)
+            char (str (nth password idx))]
+        (is (= char (get-element-value-el *driver* input)) (str "idx=" idx " char=" char " input=" input))))))
+
 (defn verify-typing-input-via-helper [{:keys [login-url
                                               login-selector
                                               valid-login
@@ -99,16 +109,13 @@
   (click *driver* submit-login-selector)
   (before-fill-password)
   (wait-visible *driver* {:id :password-helper-input})
-  (fill *driver* {:id :password-helper-input} password)
-  (let [password-inputs
-        (->> (query-all *driver* {:tag :input :type :password :maxlength 1})
-             (remove #(get-element-attr-el *driver* % :readonly))
-             (remove #(get-element-attr-el *driver* % :disabled)))]
-    (doseq [input password-inputs]
-      (let [idx (idx-from-input input)
-            char (str (nth password idx))]
-        (is (= char (get-element-value-el *driver* input)) (str "idx=" idx " char=" char " input=" input)))))
-  (after-fill-password))
+  (wait *driver* 1)                                         ;; wait for the animation to finish, JS to steal focus and so on
+  (fill-human *driver* {:id :password-helper-input} password)
+  (let [test-results (verify-password-input-values idx-from-input)]
+    (doall test-results)
+    (after-fill-password)
+    (if (some false? test-results)
+      (postmortem-handler *driver* {:dir (str project-dir "/postmortems")}))))
 
 (deftest ing
   (verify-typing-input-via-helper {:login-url "https://login.ingbank.pl/"
