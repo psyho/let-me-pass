@@ -3,3 +3,4 @@ password-helper.iml
 target
 node_modules
 postmortems
+figwheel_server.log

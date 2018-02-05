@@ -13,6 +13,24 @@
   [message]
   (if debugging (console/log message)))
 
+(def running-inline (undefined? js/chrome.extension))
+
+(defn get-asset-url
+  "Returns asset URL"
+  [type name]
+  (if running-inline
+    (str "../resources/" type  "/" name)
+    (extension/get-url name)))
+
+(defn get-css-asset-url
+  "Returns CSS asset URL"
+  [name]
+  (get-asset-url "css" name))
+
+(defn get-js-asset-url
+  "Returns JS asset URL"
+  [name]
+  (get-asset-url "js" name))
 
 (defn input-id!
   "Returns the id of the given input, if input has no ID, then assigns a random one to it"
@@ -40,17 +58,19 @@
     (simulate-user-input input (get password idx ""))))
 
 
+(defonce app-atom (r/atom {:password ""
+                           :last-keypress-time (js/Date. 0)}))
+
+
 (defn password-helper-app-root
   "This is the react root component for the password helper"
   [input-map]
-  (let [password (r/atom "")
-        update-password #(do
-                           (reset! password (-> % .-target .-value))
-                           (on-input-change @password input-map))
+  (let [update-password #(do
+                           (swap! app-atom assoc :password (-> % .-target .-value))
+                           (on-input-change (:password @app-atom) input-map))
 
-        last-keypress-time (atom (js/Date. 0))
-        update-keypress-time #(reset! last-keypress-time (js/Date.))
-        elapsed-since-last-keypress #(- (.getTime (js/Date.)) (.getTime @last-keypress-time))
+        update-keypress-time #(swap! app-atom assoc :last-keypress-time (js/Date.))
+        elapsed-since-last-keypress #(- (.getTime (js/Date.)) (.getTime (:last-keypress-time @app-atom)))
         maintain-focus #(if (< (elapsed-since-last-keypress) 500)
                           (.focus (.-target %)))]
     (fn []
@@ -58,8 +78,8 @@
        [:div.uk-card-title.uk-h3 "Password Helper"]
        [:input.uk-input {:type "password"
                          :placeholder "Enter your full password here"
-                         :value @password
-                         :on-input update-password
+                         :value (:password @app-atom)
+                         :on-change update-password
                          :on-key-down update-keypress-time
                          :on-key-up update-keypress-time
                          :on-blur maintain-focus
@@ -71,7 +91,7 @@
   [:div#password-helper-box.password-helper-container
 
    ;; needed to hack around the fact that Chrome has broken KeyboardEvents that don't accept keyCode and which
-   [:script {:type "text/javascript" :src (extension/get-url "simulate_input.js")}]
+   [:script {:type "text/javascript" :src (get-js-asset-url "simulate_input.js")}]
 
    [:div#password-helper-app-root]])
 
@@ -86,12 +106,12 @@
 (defn password-helper-stylesheet
   "Link to the extension stylesheet"
   []
-  [:link {:type "text/css" :rel "stylesheet" :href (extension/get-url "password_helper.css")}])
+  [:link {:type "text/css" :rel "stylesheet" :href (get-css-asset-url "password_helper.css")}])
 
 (defn uikit-stylesheet
   "Link to the uikit stylesheet"
   []
-  [:link {:type "text/css" :rel "stylesheet" :href (extension/get-url "uikit.min.css")}])
+  [:link {:type "text/css" :rel "stylesheet" :href (get-css-asset-url "uikit.min.css")}])
 
 (defn append-stylesheet [document html]
   "Append stylesheet tag to head element"
@@ -298,9 +318,21 @@
   (debug "Partial password not found on page. Waiting to inject Password Helper until partial password shows up.")
   (listen-for-page-changes))
 
+(defn remove-password-helper-html
+  "Removes Password Helper html root element from page, so that it can be re-rendered"
+  []
+  (when-let [root (find-password-helper-root js/document)]
+    (debug "Removing password helper HTML from page")
+    (dommy/remove! root)))
+
+(defn init-password-helper
+  "Initialises password helper on page"
+  []
+  (if-let [document (page-contains-partial-password?)]
+    (start-password-helper document)
+    (wait-to-add-password-helper)))
+
 (defn init
   "Main entry point of the application. Called from content.js"
   []
-  (dommy/listen! js/window :load #(if-let [document (page-contains-partial-password?)]
-                                           (start-password-helper document)
-                                           (wait-to-add-password-helper))))
+  (dommy/listen! js/window :load init-password-helper))
