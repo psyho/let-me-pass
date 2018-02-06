@@ -62,28 +62,46 @@
                            :last-keypress-time (js/Date. 0)}))
 
 
+(defn update-password
+  "Updates password in the app state atom and triggers callback"
+  [new-password input-map]
+  (swap! app-atom assoc :password new-password)
+  (on-input-change (:password @app-atom) input-map))
+
+
+(defn update-keypress-time
+  "Updates last keypress time in tha app state atom"
+  []
+  (swap! app-atom assoc :last-keypress-time (js/Date.)))
+
+
+(defn elapsed-since-last-keypress
+  "Returns the number of milliseconds that passed since last keypress time"
+  []
+  (- (.getTime (js/Date.)) (.getTime (:last-keypress-time @app-atom))))
+
+
+(defn key-pressed-recently?
+  "Returns true if the user typed recently into the password input"
+  []
+  (< (elapsed-since-last-keypress) 500))
+
+
 (defn password-helper-app-root
   "This is the react root component for the password helper"
   [input-map]
-  (let [update-password #(do
-                           (swap! app-atom assoc :password (-> % .-target .-value))
-                           (on-input-change (:password @app-atom) input-map))
 
-        update-keypress-time #(swap! app-atom assoc :last-keypress-time (js/Date.))
-        elapsed-since-last-keypress #(- (.getTime (js/Date.)) (.getTime (:last-keypress-time @app-atom)))
-        maintain-focus #(if (< (elapsed-since-last-keypress) 500)
-                          (.focus (.-target %)))]
-    (fn []
-      [:div.uk-card.uk-card-small.uk-card-primary.uk-card-body.uk-animation-slide-right
-       [:div.uk-card-title.uk-h3 "Password Helper"]
-       [:input.uk-input {:type "password"
-                         :placeholder "Enter your full password here"
-                         :value (:password @app-atom)
-                         :on-change update-password
-                         :on-key-down update-keypress-time
-                         :on-key-up update-keypress-time
-                         :on-blur maintain-focus
-                         :id "password-helper-input"}]])))
+  [:div.uk-card.uk-card-small.uk-card-primary.uk-card-body.uk-animation-slide-right
+   [:div.uk-card-title.uk-h3 "Password Helper"]
+   [:input.uk-input {:type "password"
+                     :placeholder "Enter your full password here"
+                     :value (:password @app-atom)
+                     :on-change #(update-password (-> % .-target .-value) input-map)
+                     :on-key-down update-keypress-time
+                     :on-key-up update-keypress-time
+                     :on-blur #(if (key-pressed-recently?) (.focus (.-target %)))
+                     :id "password-helper-input"}]])
+
 
 (defn password-helper-box
   "The main HTML element injected into the page"
@@ -317,13 +335,6 @@
   []
   (debug "Partial password not found on page. Waiting to inject Password Helper until partial password shows up.")
   (listen-for-page-changes))
-
-(defn remove-password-helper-html
-  "Removes Password Helper html root element from page, so that it can be re-rendered"
-  []
-  (when-let [root (find-password-helper-root js/document)]
-    (debug "Removing password helper HTML from page")
-    (dommy/remove! root)))
 
 (defn init-password-helper
   "Initialises password helper on page"
