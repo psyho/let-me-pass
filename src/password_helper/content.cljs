@@ -59,7 +59,9 @@
 
 
 (defonce app-atom (r/atom {:password ""
-                           :last-keypress-time (js/Date. 0)}))
+                           :last-keypress-time (js/Date. 0)
+                           :mode :main-menu
+                           :selected-letters (sorted-set)}))
 
 
 (defn update-password
@@ -86,6 +88,36 @@
   []
   (< (elapsed-since-last-keypress) 500))
 
+
+(defn open-pick-chars
+  "Opens pick characters menu"
+  [evt]
+  (swap! app-atom assoc :mode :pick-chars)
+  (.stopPropagation evt))
+
+
+(defn open-main-menu
+  "Opens main menu"
+  [evt]
+  (swap! app-atom assoc :mode :main-menu)
+  (.stopPropagation evt))
+
+
+(defn toggle
+  "Toggles element presence in a set"
+  [set element]
+  (if (contains? set element)
+    (disj set element)
+    (conj set element)))
+
+
+(defn toggle-selected-letter
+  "Adds or removes the selected letter"
+  [idx]
+  (let [selected-letters (:selected-letters @app-atom)]
+    (swap! app-atom assoc :selected-letters (toggle selected-letters idx))))
+
+
 (defn main-input-area
   "The part of the password helper box that contains the main password input"
   [input-map]
@@ -101,17 +133,63 @@
                      :on-blur #(if (key-pressed-recently?) (.focus (.-target %)))
                      :id "password-helper-input"}]])
 
+(defn main-menu
+  "Main menu with links to pick chars / report etc"
+  []
+  [:div
+   [:div.uk-card-title.uk-h4 "Didn't work?"]
+   [:ul.uk-list
+    [:li
+     [:a.uk-link-muted {:href "#" :on-click open-pick-chars} "Pick password characters >"]]
+    [:li
+     [:a.uk-link-muted {:href "#" :on-click #()} "Report unsupported page >"]]]])
+
+
+(defn pick-char-button-class
+  "Selects a class baseed on whether the input is selected or not"
+  [idx]
+  (if (contains? (:selected-letters @app-atom) idx)
+    :uk-button-primary
+    :uk-button-default))
+
+
+(defn pick-char-button
+  "Button to pick a given character password"
+  [idx]
+  [:button.uk-button.uk-button-small.uk-button-default.uk-margin-small-right.uk-margin-bottom.password-helper-pick-chars-button
+   {:key idx
+    :class (pick-char-button-class idx)
+    :on-click #(toggle-selected-letter idx)}
+   (str (inc idx))])
+
+
+(defn pick-chars-buttons
+  "Renders pick chars buttons or a message if password is empty"
+  [password]
+
+  (if (empty? password)
+    [:div.uk-text-warning "You need to type something into the password input first."]
+    [:div.password-helper-grid.wrapping
+     (map pick-char-button (range (count password)))]))
+
+
+(defn pick-chars
+  "Pick chars UI element"
+  []
+  [:div.password-helper-pick-chars-container
+   [:div.uk-card-title.uk-h4 "Pick Password Characters"]
+   (pick-chars-buttons (:password @app-atom))
+   [:a.uk-link-muted.password-helper-pick-chars-close {:href "#" :on-click open-main-menu} "[X]"]])
+
+
 (defn secondary-interaction-area
   "The part of the password helper box that contains the variable content - pick chars / report, etc"
   []
 
   [:div.uk-width-1-2.uk-margin-small-left
-   [:div.uk-card-title.uk-h4 "Didn't work?"]
-   [:ul.uk-list
-    [:li
-     [:a.uk-link-muted {:href "#" :on-click #()} "Pick password characters >"]]
-    [:li
-     [:a.uk-link-muted {:href "#" :on-click #()} "Report unsupported page >"]]]])
+   (case (:mode @app-atom)
+     :main-menu [main-menu]
+     :pick-chars [pick-chars])])
 
 (defn password-helper-app-root
   "This is the react root component for the password helper"
