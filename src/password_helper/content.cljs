@@ -86,12 +86,11 @@
   []
   (< (elapsed-since-last-keypress) 500))
 
-
-(defn password-helper-app-root
-  "This is the react root component for the password helper"
+(defn main-input-area
+  "The part of the password helper box that contains the main password input"
   [input-map]
 
-  [:div.uk-card.uk-card-small.uk-card-primary.uk-card-body.uk-animation-slide-right
+  [:div.uk-width-1-2.uk-margin-small-right
    [:div.uk-card-title.uk-h3 "Password Helper"]
    [:input.uk-input {:type "password"
                      :placeholder "Enter your full password here"
@@ -101,6 +100,26 @@
                      :on-key-up update-keypress-time
                      :on-blur #(if (key-pressed-recently?) (.focus (.-target %)))
                      :id "password-helper-input"}]])
+
+(defn secondary-interaction-area
+  "The part of the password helper box that contains the variable content - pick chars / report, etc"
+  []
+
+  [:div.uk-width-1-2.uk-margin-small-left
+   [:div.uk-card-title.uk-h4 "Didn't work?"]
+   [:ul.uk-list
+    [:li
+     [:a.uk-link-muted {:href "#" :on-click #()} "Pick password characters >"]]
+    [:li
+     [:a.uk-link-muted {:href "#" :on-click #()} "Report unsupported page >"]]]])
+
+(defn password-helper-app-root
+  "This is the react root component for the password helper"
+  [input-map]
+
+  [:div.uk-card.uk-card-small.uk-card-primary.uk-card-body.uk-animation-slide-right.password-helper-grid
+   [main-input-area input-map]
+   [secondary-interaction-area]])
 
 
 (defn password-helper-box
