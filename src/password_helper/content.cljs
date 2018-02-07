@@ -61,14 +61,18 @@
 (defonce app-atom (r/atom {:password ""
                            :last-keypress-time (js/Date. 0)
                            :mode :main-menu
+                           :global-input-map {}
                            :selected-letters (sorted-set)}))
-
 
 (defn update-password
   "Updates password in the app state atom and triggers callback"
-  [new-password input-map]
+  [new-password]
   (swap! app-atom assoc :password new-password)
-  (on-input-change (:password @app-atom) input-map))
+  (on-input-change (:password @app-atom) (:global-input-map @app-atom)))
+
+
+(defn set-global-input-map [input-map]
+  (swap! app-atom assoc :global-input-map input-map))
 
 
 (defn update-keypress-time
@@ -120,14 +124,14 @@
 
 (defn main-input-area
   "The part of the password helper box that contains the main password input"
-  [input-map]
+  []
 
   [:div.uk-width-1-2.uk-margin-small-right
    [:div.uk-card-title.uk-h3 "Password Helper"]
    [:input.uk-input {:type "password"
                      :placeholder "Enter your full password here"
                      :value (:password @app-atom)
-                     :on-change #(update-password (-> % .-target .-value) input-map)
+                     :on-change #(update-password (-> % .-target .-value))
                      :on-key-down update-keypress-time
                      :on-key-up update-keypress-time
                      :on-blur #(if (key-pressed-recently?) (.focus (.-target %)))
@@ -193,10 +197,10 @@
 
 (defn password-helper-app-root
   "This is the react root component for the password helper"
-  [input-map]
+  []
 
   [:div.uk-card.uk-card-small.uk-card-primary.uk-card-body.uk-animation-slide-right.password-helper-grid
-   [main-input-area input-map]
+   [main-input-area]
    [secondary-interaction-area]])
 
 
@@ -216,7 +220,8 @@
   (.appendChild (.-body document)
                 (hipo/create (password-helper-box)))
   (let [app-root (sel1 document :#password-helper-app-root)]
-    (r/render [password-helper-app-root input-map] app-root)))
+    (set-global-input-map input-map)
+    (r/render [password-helper-app-root] app-root)))
 
 (defn password-helper-stylesheet
   "Link to the extension stylesheet"
