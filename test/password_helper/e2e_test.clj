@@ -213,3 +213,9 @@
                                    :login-selector        {:id :pinId}
                                    :submit-login-selector [{:tag :form :name :login} {:tag :input :type :submit}]
                                    :idx-from-input        idx-from-parent-text}))
+
+(deftest alior-kantor
+  (verify-typing-input-via-helper {:login-url "https://kantor.aliorbank.pl/login"
+                                   :login-selector {:tag :input :name :login}
+                                   :submit-login-selector [{:class :wk-submit} {:tag :input :type :submit}]
+                                   :idx-from-input idx-from-input-id}))
