@@ -252,7 +252,7 @@
 (defn pick-char-button
   "Button to pick a given character password"
   [idx selected-letters]
-  [:button.uk-button.uk-button-small.uk-button-default.uk-margin-small-right.uk-margin-bottom.password-helper-pick-chars-button
+  [:button.uk-button.uk-button-small.uk-button-default.uk-margin-small-right.uk-margin-small-bottom.password-helper-pick-chars-button
    {:key idx
     :class (pick-char-button-class idx selected-letters)
     :on-click #(on-character-picked idx)}
