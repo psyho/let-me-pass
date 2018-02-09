@@ -236,9 +236,9 @@
    [:div.uk-card-title.uk-h4 "Didn't work?"]
    [:ul.uk-list
     [:li
-     [:a.uk-link-muted {:href "#" :on-click open-pick-chars} "Pick password characters >"]]
+     [:a.uk-link-muted.password-helper-open-pick-chars {:href "#" :on-click open-pick-chars} "Pick password characters >"]]
     [:li
-     [:a.uk-link-muted {:href "#" :on-click #()} "Report unsupported page >"]]]])
+     [:a.uk-link-muted.password-helper-open-report {:href "#" :on-click #()} "Report unsupported page >"]]]])
 
 
 (defn pick-char-button-class
@@ -254,6 +254,7 @@
   [idx selected-letters]
   [:button.uk-button.uk-button-small.uk-button-default.uk-margin-small-right.uk-margin-small-bottom.password-helper-pick-chars-button
    {:key idx
+    :id (str "pick-char-" idx)
     :class (pick-char-button-class idx selected-letters)
     :on-click #(on-character-picked idx)}
    (str (inc idx))])

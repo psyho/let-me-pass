@@ -4,3 +4,5 @@ target
 node_modules
 postmortems
 figwheel_server.log
+.lein-failures
+.lein-repl-history
