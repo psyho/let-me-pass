@@ -5,7 +5,7 @@
 (def params {:login-url             "https://system.t-mobilebankowe.pl/web/login"
              :valid-login           "123123"
              :login-selector        {:tag :input :type :text :maxlength 100}
-             :submit-login-selector [{:class "RjVxsd"} {:tag :button}]
+             :submit-login-selector {:xpath "//*[contains(text(), 'DALEJ')]"}
              :idx-from-input        common/idx-from-sibling-label})
 
 (use-fixtures :each common/fixture-driver)

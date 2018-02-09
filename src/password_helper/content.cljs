@@ -181,7 +181,7 @@
   [evt]
   (swap! app-atom assoc :mode :pick-chars)
   (on-input-change)
-  (.stopPropagation evt))
+  (.preventDefault evt))
 
 
 (defn open-main-menu
@@ -189,7 +189,7 @@
   [evt]
   (swap! app-atom assoc :mode :main-menu)
   (on-input-change)
-  (.stopPropagation evt))
+  (.preventDefault evt))
 
 
 (defn toggle
