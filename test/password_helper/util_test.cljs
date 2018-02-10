@@ -1,6 +1,7 @@
-(ns password-helper.content-test
+(ns password-helper.util-test
   (:require [cljs.test :refer-macros [deftest is testing]]
-            [password-helper.content :refer [first-number at-index]]))
+            [password-helper.util :refer [first-number at-index]]))
+
 
 (deftest first-number-test
   (testing "blank"
@@ -26,6 +27,7 @@
     (is (= "-1" (first-number "second last")))
     (is (= "-1" (first-number "second to last")))
     (is (= "-1" (first-number "SECOND last")))))
+
 
 (deftest at-index-test
   (testing "blank"

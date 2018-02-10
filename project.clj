@@ -19,39 +19,36 @@
                         [lein-figwheel "0.5.14"]
                         [lein-chromebuild "0.3.0"]]
 
-              :cljsbuild
-                       {:builds
-                        [
-                         {:id :main
-                          :source-paths ["src"]
-                          :compiler {:output-to "target/unpacked/password_helper.js"
-                                     :output-dir "target/unpacked"
-                                     :optimizations :whitespace
-                                     :source-map "target/unpacked/password_helper.js.map"
-                                     :closure-output-charset "US-ASCII"
-                                     :pretty-print true}}
+              :cljsbuild {:builds {
+                                   :main
+                                   {:source-paths ["src"]
+                                    :compiler {:output-to "target/unpacked/password_helper.js"
+                                               :output-dir "target/unpacked"
+                                               :optimizations :whitespace
+                                               :source-map "target/unpacked/password_helper.js.map"
+                                               :closure-output-charset "US-ASCII"
+                                               :pretty-print true}}
 
-                         {:id :reloadable
-                          :source-paths ["src"]
-                          :figwheel true
-                          :compiler {:output-to "target/reloadable/password_helper.js"
-                                     :output-dir "target/reloadable"
-                                     :asset-path "../target/reloadable"
-                                     :main password-helper.content-start
-                                     :source-map true
-                                     :closure-output-charset "US-ASCII"
-                                     :pretty-print true}}
+                                   :reloadable
+                                   {:source-paths ["src"]
+                                    :figwheel true
+                                    :compiler {:output-to "target/reloadable/password_helper.js"
+                                               :output-dir "target/reloadable"
+                                               :asset-path "../target/reloadable"
+                                               :main password-helper.content-start
+                                               :source-map true
+                                               :closure-output-charset "US-ASCII"
+                                               :pretty-print true}}
 
-                         {:id :test
-                          :source-paths ["src" "test"]
-                          :compiler {:output-to "target/test/password_helper_test.js"
-                                     :output-dir "target/test"
-                                     :main password-helper.runner
-                                     :optimizations :whitespace
-                                     :source-map "target/test/password_helper_test.js.map"
-                                     :closure-output-charset "US-ASCII"
-                                     :pretty-print true}}
-                         ]}
+                                   :test
+                                   {:source-paths ["src" "test"]
+                                    :compiler {:output-to "target/test/password_helper_test.js"
+                                               :output-dir "target/test"
+                                               :main password-helper.runner
+                                               :optimizations :whitespace
+                                               :source-map "target/test/password_helper_test.js.map"
+                                               :closure-output-charset "US-ASCII"
+                                               :pretty-print true}}}}
 
               :figwheel {:css-dirs ["resources/css"]}
 
