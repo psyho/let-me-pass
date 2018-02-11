@@ -16,8 +16,8 @@
 (def debugging true)
 (defn- debug
   "Prints a debug message if debugging is enabled"
-  [message]
-  (if debugging (console/log message)))
+  [message & args]
+  (if debugging (apply console/log message args)))
 
 
 (def running-inline (undefined? js/chrome.extension))
@@ -61,3 +61,7 @@
     (get string positive-idx "")))
 
 
+(defn current-hostname
+  "Returns the hostname of the current page"
+  []
+  (-> js/window .-location .-hostname))

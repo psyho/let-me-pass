@@ -2,6 +2,7 @@
   (:require [dommy.core :as dommy :refer-macros [sel1 sel]]
             [dommy.utils :refer [->Array]]
             [goog.dom :as gdom]
+            [hipo.core :as hipo]
             [password-helper.util :as util]))
 
 
@@ -180,5 +181,10 @@
   "Checks input on a page and returns true if the pages seems to contain a partial password"
   []
   (first (filter #(seq (find-partial-password-inputs %)) (all-frame-docs))))
+
+
+(defn append-to-head [document html]
+  "Append renedered html to head element"
+  (.appendChild (.-head document) (hipo/create html)))
 
 

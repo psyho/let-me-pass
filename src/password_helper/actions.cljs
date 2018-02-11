@@ -1,7 +1,8 @@
 (ns password-helper.actions
   (:require [password-helper.state :as state]
             [password-helper.dom :as dom]
-            [password-helper.util :as util]))
+            [password-helper.util :as util]
+            [password-helper.analytics :as analytics]))
 
 
 (defn on-input-change
@@ -19,6 +20,7 @@
   "Updates password in the app state atom and triggers callback"
   [new-password]
   (state/set-password new-password)
+  (analytics/track-event "Password Entered")
   (on-input-change))
 
 
@@ -26,6 +28,7 @@
   "Opens pick characters menu"
   [evt]
   (state/set-mode :pick-chars)
+  (analytics/track-event "Pick Chars Opened")
   (on-input-change)
   (.preventDefault evt))
 
@@ -34,6 +37,7 @@
   "Opens main menu"
   [evt]
   (state/set-mode :main-menu)
+  (analytics/track-event "Main Menu Opened")
   (on-input-change)
   (.preventDefault evt))
 

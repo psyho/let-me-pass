@@ -5,7 +5,8 @@
             [password-helper.state :as state]
             [password-helper.views :as views]
             [password-helper.dom :as dom]
-            [password-helper.util :as util]))
+            [password-helper.util :as util]
+            [password-helper.analytics :as analytics]))
 
 
 (defn inject-password-helper-box
@@ -21,16 +22,11 @@
     (r/render [views/password-helper-app-root] app-root)))
 
 
-(defn append-stylesheet [document html]
-  "Append stylesheet tag to head element"
-  (.appendChild (.-head document) (hipo/create html)))
-
-
 (defn inject-stylesheets
   "Injects password helper CSS into document HEAD"
   [document]
-  (append-stylesheet document (views/password-helper-stylesheet))
-  (append-stylesheet document (views/uikit-stylesheet)))
+  (dom/append-to-head document (views/password-helper-stylesheet))
+  (dom/append-to-head document (views/uikit-stylesheet)))
 
 
 (defn inject-html
@@ -46,6 +42,7 @@
   [document]
   (when-not (dom/find-password-helper-root document)
     (util/debug "Injecting Password Helper")
+    (analytics/track-event "Shown")
     (inject-html document (dom/build-index-input-map document))))
 
 
@@ -85,4 +82,5 @@
 (defn init
   "Main entry point of the application. Called from content.js"
   []
+  (analytics/init "UA-113896134-1")
   (dommy/listen! js/window :load init-password-helper))
