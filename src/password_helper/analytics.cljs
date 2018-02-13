@@ -1,6 +1,8 @@
 (ns password-helper.analytics
   (:require [password-helper.dom :as dom]
-            [password-helper.util :as util]))
+            [password-helper.util :as util]
+            [khroma.runtime :as runtime]
+            [cljs.core.async :refer [go >!]]))
 
 
 (defn google-analytics-script
@@ -25,7 +27,9 @@
     (track-event name {}))
 
   ([name {:keys [category label value] :or {category :engagement label (util/current-hostname)}}]
-    (gtag :event name {:event_category category :event_label label :value value})))
+   (let [bg (runtime/connect)]
+     (go (>! bg {:type "send-analytics"
+                 :data [:event name {:event_category category :event_label label :value value}]})))))
 
 
 (defn install-script

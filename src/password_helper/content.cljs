@@ -98,5 +98,4 @@
 (defn init
   "Main entry point of the application. Called from content.js"
   []
-  (analytics/init "UA-113896134-1")
   (dommy/listen! js/window :load init-password-helper))

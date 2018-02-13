@@ -6,6 +6,10 @@
     "48": "icon48.png",
     "128": "icon128.png"
   },
+  "background": {
+    "scripts": ["password_helper.js", "background.js"],
+    "persistent": false
+  },
  "content_scripts": [
     {
       "matches": ["*://*/*"],
@@ -14,7 +18,7 @@
       "run_at": "document_end"
     }
   ],
-  "content_security_policy": "script-src 'self' https://www.googletagmanager.com; object-src 'self'",
+  "content_security_policy": "script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com; object-src 'self'",
   "web_accessible_resources": ["password_helper.css", "uikit.min.css", "simulate_input.js"],
   "manifest_version": 2
 }
