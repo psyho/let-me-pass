@@ -3,21 +3,21 @@
             [khroma.extension :as extension]))
 
 
+(def debugging true)
+(defn- debug
+  "Prints a debug message if debugging is enabled"
+  [message & args]
+  (if debugging (apply console/log message args)))
+
+
 (defn ignore-errors
   "Executes the given function and ignores errors thrown (logs them to console)"
   [f]
   (try
     (f)
     (catch :default e
-      (console/warn e)
+      (debug e)
       nil)))
-
-
-(def debugging true)
-(defn- debug
-  "Prints a debug message if debugging is enabled"
-  [message & args]
-  (if debugging (apply console/log message args)))
 
 
 (def running-inline (undefined? js/chrome.extension))

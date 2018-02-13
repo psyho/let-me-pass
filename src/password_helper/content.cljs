@@ -40,8 +40,9 @@
 (defn start-password-helper
   "Start Password Helper on the page (add HTML, register event handlers, etc)"
   [document]
-  (when-not (dom/find-password-helper-root document)
+  (when-not (state/injected?)
     (util/debug "Injecting Password Helper")
+    (state/injected!)
     (analytics/track-event "Shown")
     (inject-html document (dom/build-index-input-map document))))
 
@@ -49,18 +50,33 @@
 (defn remove-password-helper
   "Removes password helper input from the page, if added"
   []
-  (doseq [document (dom/all-frame-docs)]
-    (if-let [elem (dom/find-password-helper-root document)]
-      (dommy/remove! elem))))
+  (when (state/injected?)
+    (state/removed!)
+    (doseq [document (dom/all-frame-docs)]
+      (if-let [elem (dom/find-password-helper-root document)]
+        (dommy/remove! elem)))))
+
+
+(defn toggle-partial-password-shown
+  "Shows of hides password helper depending on page contents"
+  []
+  (when (state/changes-detected?)
+    (state/changes-processed!)
+    (util/debug "Processing state change.")
+    (if-let [document (dom/page-contains-partial-password?)]
+      (start-password-helper document)
+      (remove-password-helper))))
+
+
+(defonce toggle-password-interval (.setInterval js/window toggle-partial-password-shown 1000))
 
 
 (defn listen-for-page-changes
   "If any change in DOM happens, checks if it seems like the page contains partial password and adds password helper in such case"
   []
   (let [mutation-observer (js/MutationObserver. (fn [_]
-                                                  (if-let [document (dom/page-contains-partial-password?)]
-                                                    (start-password-helper document)
-                                                    (remove-password-helper))))]
+                                                  (util/debug "Page change detected.")
+                                                  (state/changes-detected!)))]
     (.observe mutation-observer js/document.body #js {:childList true :subtree true})))
 
 

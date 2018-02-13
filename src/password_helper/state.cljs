@@ -3,6 +3,8 @@
 
 
 (defonce app-atom (r/atom {:password           ""
+                           :injected           false
+                           :changes-detected   false
                            :last-keypress-time (js/Date. 0)
                            :mode               :main-menu
                            :letter-inputs      []
@@ -14,6 +16,42 @@
   "Update state atom by setting key to value"
   [key value]
   (swap! app-atom assoc key value))
+
+
+(defn injected!
+  "Marks password helper as injected"
+  []
+  (update-state :injected true))
+
+
+(defn removed!
+  "Marks password helper as removed"
+  []
+  (update-state :injected false))
+
+
+(defn injected?
+  "Is password helper currently injected into the page?"
+  []
+  (:injected @app-atom))
+
+
+(defn changes-detected!
+  "Puts a flag up that some changes in dom were detected"
+  []
+  (update-state :changes-detected true))
+
+
+(defn changes-processed!
+  "Puts a flag down after changes were processed"
+  []
+  (update-state :changes-detected false))
+
+
+(defn changes-detected?
+  "Returns true if some changes were detected in DOM"
+  []
+  (:changes-detected @app-atom))
 
 
 (defn get-input-map
