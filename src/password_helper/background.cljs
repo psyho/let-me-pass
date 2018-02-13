@@ -8,7 +8,7 @@
   [{type "type" data "data" :as message}]
   (util/debug "Message from content script:" message)
   (case type
-    "send-analytics" (apply analytics/gtag data)
+    "send-analytics" (apply analytics/ga data)
     (util/debug "Unknown message: " message)))
 
 
