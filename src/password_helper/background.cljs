@@ -15,7 +15,7 @@
 (defn listen-for-messages
   "Listens for messages sent from the content script"
   []
-  (go (let [conns (runtime/on-connect)
+  (go (let [conns (util/get-incoming-channel)
             content (<! conns)]
         (handle-message (<! content))
         (listen-for-messages))))

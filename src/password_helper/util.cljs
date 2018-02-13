@@ -1,6 +1,8 @@
 (ns password-helper.util
   (:require [khroma.log :as console]
-            [khroma.extension :as extension]))
+            [khroma.extension :as extension]
+            [khroma.runtime :as runtime]
+            [cljs.core.async :as async :refer [>! go]]))
 
 
 (def debugging true)
@@ -65,3 +67,24 @@
   "Returns the hostname of the current page"
   []
   (-> js/window .-location .-hostname))
+
+
+(def communication-channel (async/chan))
+
+
+(defn get-incoming-channel
+  "Returns a channel which can be used to read messages sent from content script"
+  []
+  (if running-inline
+    (let [conns (async/chan)]
+      (go (>! conns communication-channel))
+      conns)
+    (runtime/on-connect)))
+
+
+(defn get-outgoing-channel
+  "Returns a channel which can be used to send messages to the background script"
+  []
+  (if running-inline
+    communication-channel
+    (runtime/connect)))

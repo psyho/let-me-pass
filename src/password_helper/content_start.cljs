@@ -1,8 +1,10 @@
 (ns password-helper.content-start
-  (:require [password-helper.content :as c]
+  (:require [password-helper.content :as content]
+            [password-helper.background :as background]
             [password-helper.util :as util]))
 
 (when util/running-inline
-  (c/init)
-  (c/remove-password-helper)
-  (c/init-password-helper))
+  (content/init)
+  (background/init)
+  (content/remove-password-helper)
+  (content/init-password-helper))

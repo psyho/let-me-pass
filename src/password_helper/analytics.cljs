@@ -27,9 +27,9 @@
     (track-event name {}))
 
   ([name {:keys [category label value] :or {category :engagement label (util/current-hostname)}}]
-   (let [bg (runtime/connect)]
-     (go (>! bg {:type "send-analytics"
-                 :data [:event name {:event_category category :event_label label :value value}]})))))
+   (let [bg (util/get-outgoing-channel)]
+     (go (>! bg {"type" "send-analytics"
+                 "data" ["event" name {"event_category" category "event_label" label "value" value}]})))))
 
 
 (defn install-script
