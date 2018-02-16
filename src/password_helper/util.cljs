@@ -88,3 +88,12 @@
   (if running-inline
     communication-channel
     (runtime/connect)))
+
+
+(def prefilled-report-problem-url "https://docs.google.com/forms/d/e/1FAIpQLSdC_SMeYaVpx-60rxR6XXhDiDHoJLltJNXC3MAmxS8PgMbvBw/viewform?usp=pp_url&entry.1715275636=URL.GOES.HERE&entry.938365311&entry.1821262036")
+
+
+(defn report-problem-url
+  "Returns the URL for report problem form"
+  []
+  (.replace prefilled-report-problem-url "URL.GOES.HERE" (current-hostname)))

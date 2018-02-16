@@ -29,7 +29,7 @@
     [:li
      [:a.uk-link-muted.password-helper-open-pick-chars {:href "#" :on-click actions/open-pick-chars} "Pick password characters >"]]
     [:li
-     [:a.uk-link-muted.password-helper-open-report {:href "#" :on-click #()} "Report unsupported page >"]]]])
+     [:a.uk-link-muted.password-helper-open-report {:href (util/report-problem-url) :target "_blank" :on-click actions/report-problem} "Report problem >"]]]])
 
 
 (defn pick-char-button-class

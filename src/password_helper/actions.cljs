@@ -49,3 +49,7 @@
   (on-input-change))
 
 
+(defn report-problem
+  "Tracks the reprot problem form being opened"
+  []
+  (analytics/track-event "Problem Reported"))
