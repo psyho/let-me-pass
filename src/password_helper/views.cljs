@@ -9,7 +9,7 @@
   []
 
   [:div.uk-width-1-2.uk-margin-small-right
-   [:div.uk-card-title.uk-h3 "Password Helper"]
+   [:div.uk-card-title.uk-h3 "let|me|pass"]
    [:input.uk-input {:type        "password"
                      :placeholder "Enter your full password here"
                      :value       (state/get-password)

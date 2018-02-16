@@ -52,7 +52,7 @@
 
               :figwheel {:css-dirs ["resources/css"]}
 
-              :chromebuild {:resource-paths ["resources/js" "resources/css" "resources/images"]
+              :chromebuild {:resource-paths ["resources/js" "resources/css" "resources/images" "resources/fonts"]
                             :target-path "target/unpacked"}
 
               :eftest {:multithread? true}

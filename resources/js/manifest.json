@@ -19,7 +19,7 @@
     }
   ],
   "content_security_policy": "script-src 'self' https://www.google-analytics.com; object-src 'self'",
-  "web_accessible_resources": ["password_helper.css", "uikit.min.css", "simulate_input.js"],
+  "web_accessible_resources": ["password_helper.css", "uikit.min.css", "simulate_input.js", "OpenSans-Bold.ttf", "Roboto-Regular.ttf"],
   "manifest_version": 2
 }
 
