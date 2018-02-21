@@ -1,7 +1,6 @@
 (ns password-helper.analytics
   (:require [password-helper.dom :as dom]
             [password-helper.util :as util]
-            [khroma.runtime :as runtime]
             [cljs.core.async :refer [go >!]]))
 
 

@@ -1,7 +1,6 @@
 (ns password-helper.background
   (:require [password-helper.analytics :as analytics]
             [password-helper.util :as util]
-            [khroma.runtime :as runtime]
             [cljs.core.async :refer [go <!]]))
 
 (defn handle-message
@@ -15,13 +14,12 @@
 (defn listen-for-messages
   "Listens for messages sent from the content script"
   []
-  (go (let [conns (util/get-incoming-channel)
-            content (<! conns)]
+  (go (let [content (util/get-incoming-channel)]
         (handle-message (<! content))
         (listen-for-messages))))
 
 
-(defn init
+(defn ^:export init
   "Initialises the background page"
   []
   (analytics/init "UA-113896134-1")

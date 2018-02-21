@@ -95,7 +95,7 @@
     (wait-to-add-password-helper)))
 
 
-(defn init
+(defn ^:export init
   "Main entry point of the application. Called from content.js"
   []
   (dommy/listen! js/window :load init-password-helper))

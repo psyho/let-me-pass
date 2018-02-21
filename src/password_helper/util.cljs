@@ -1,7 +1,6 @@
 (ns password-helper.util
   (:require [khroma.log :as console]
             [khroma.extension :as extension]
-            [khroma.runtime :as runtime]
             [cljs.core.async :as async :refer [>! go]]))
 
 
@@ -69,17 +68,39 @@
   (-> js/window .-location .-hostname))
 
 
-(def communication-channel (async/chan))
+(defn chrome-send-message
+  "Sends a message from content script to background page
+  using chrome apis"
+  [message]
+  (js/chrome.runtime.sendMessage (clj->js message)))
 
+
+(defn make-incoming-channel []
+  (let [channel (async/chan)]
+    (js/chrome.runtime.onMessage.addListener (fn [request _ _]
+                    (go (>! channel (js->clj request)))))
+    channel))
+
+
+(defn make-outgoing-channel []
+  (let [channel (async/chan)]
+    (async/go-loop []
+                   (let [message (<! channel)]
+                     (chrome-send-message message)
+                     (recur)))
+    channel))
+
+
+(def communication-channel (async/chan))
+(def chrome-outgoing-channel (make-outgoing-channel))
+(def chrome-incoming-channel (make-incoming-channel))
 
 (defn get-incoming-channel
   "Returns a channel which can be used to read messages sent from content script"
   []
   (if running-inline
-    (let [conns (async/chan)]
-      (go (>! conns communication-channel))
-      conns)
-    (runtime/on-connect)))
+    communication-channel
+    chrome-incoming-channel))
 
 
 (defn get-outgoing-channel
@@ -87,7 +108,7 @@
   []
   (if running-inline
     communication-channel
-    (runtime/connect)))
+    chrome-outgoing-channel))
 
 
 (def prefilled-report-problem-url "https://docs.google.com/forms/d/e/1FAIpQLSdC_SMeYaVpx-60rxR6XXhDiDHoJLltJNXC3MAmxS8PgMbvBw/viewform?usp=pp_url&entry.1715275636=URL.GOES.HERE&entry.938365311&entry.1821262036")

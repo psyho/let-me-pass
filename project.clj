@@ -24,10 +24,13 @@
                                    {:source-paths ["src"]
                                     :compiler {:output-to "target/unpacked/password_helper.js"
                                                :output-dir "target/unpacked"
-                                               :optimizations :whitespace
+                                               :optimizations :advanced
                                                :source-map "target/unpacked/password_helper.js.map"
+                                               :pseudo-names true
+                                               :pretty-print true
                                                :closure-output-charset "US-ASCII"
-                                               :pretty-print true}}
+                                               :externs ["externs/externs.js"]
+                                               }}
 
                                    :reloadable
                                    {:source-paths ["src"]
