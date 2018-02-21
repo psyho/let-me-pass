@@ -11,7 +11,8 @@
 
 
 (defn define-ga []
-  (js* "window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;"))
+  (js* "window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;")
+  nil)
 
 
 (defn ga

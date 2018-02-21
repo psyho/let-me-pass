@@ -1,14 +1,12 @@
 (ns password-helper.util
-  (:require [khroma.log :as console]
-            [khroma.extension :as extension]
-            [cljs.core.async :as async :refer [>! go]]))
+  (:require [cljs.core.async :as async :refer [>! go]]))
 
 
 (def debugging true)
 (defn- debug
   "Prints a debug message if debugging is enabled"
   [message & args]
-  (if debugging (apply console/log message args)))
+  (if debugging (apply js/console.log message args)))
 
 
 (defn ignore-errors
@@ -29,7 +27,7 @@
   [type name]
   (if running-inline
     (str "../resources/" type  "/" name)
-    (extension/get-url name)))
+    (js/chrome.extension.getURL name)))
 
 
 (defn get-css-asset-url
