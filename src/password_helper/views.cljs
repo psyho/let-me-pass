@@ -9,7 +9,7 @@
   []
 
   [:div.uk-width-1-2.uk-margin-small-right
-   [:div.uk-card-title.uk-h3 "let|me|pass"]
+   [:div.password-helper-logo "let me pass"]
    [:input.uk-input {:type        "password"
                      :placeholder "Enter your full password here"
                      :value       (state/get-password)
@@ -85,6 +85,7 @@
   []
 
   [:div.uk-card.uk-card-small.uk-card-primary.uk-card-body.uk-animation-slide-right.password-helper-grid
+   {:class (if util/running-inline :running-inline)}
    [main-input-area]
    [secondary-interaction-area]])
 
