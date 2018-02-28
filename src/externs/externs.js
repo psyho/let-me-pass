@@ -8,3 +8,6 @@ window.chrome.runtime.sendMessage = function () {}
 
 window.chrome.extension = function () {}
 window.chrome.extension.getURL = function () {}
+
+window.chrome.i18n = function () {}
+window.chrome.i18n.getMessage = function () {}

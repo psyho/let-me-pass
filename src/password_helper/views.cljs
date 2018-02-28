@@ -1,7 +1,7 @@
 (ns password-helper.views
   (:require [password-helper.state :as state]
             [password-helper.actions :as actions]
-            [password-helper.util :as util]))
+            [password-helper.util :as util :refer [t]]))
 
 
 (defn main-input-area
@@ -11,7 +11,7 @@
   [:div.uk-width-1-2.uk-margin-small-right
    [:div.password-helper-logo "let me pass"]
    [:input.uk-input {:type        "password"
-                     :placeholder "Enter your full password here"
+                     :placeholder (t :input-placeholder)
                      :value       (state/get-password)
                      :on-change   #(actions/update-password (-> % .-target .-value))
                      :on-key-down state/update-keypress-time
@@ -24,12 +24,16 @@
   "Main menu with links to pick chars / report etc"
   []
   [:div
-   [:div.uk-card-title.uk-h4 "Didn't work?"]
+   [:div.uk-card-title.uk-h4 (t :main-menu-header)]
    [:ul.uk-list
     [:li
-     [:a.uk-link-muted.password-helper-open-pick-chars {:href "#" :on-click actions/open-pick-chars} "Pick password characters >"]]
+     [:a.uk-link-muted.password-helper-open-pick-chars
+      {:href "#" :on-click actions/open-pick-chars}
+      (t :pick-password-chars-action)]]
     [:li
-     [:a.uk-link-muted.password-helper-open-report {:href (util/report-problem-url) :target "_blank" :on-click actions/report-problem} "Report problem >"]]]])
+     [:a.uk-link-muted.password-helper-open-report
+      {:href (util/report-problem-url) :target "_blank" :on-click actions/report-problem}
+      (t :report-problem-action)]]]])
 
 
 (defn pick-char-button-class
@@ -56,7 +60,7 @@
   [password selected-letters]
 
   (if (empty? password)
-    [:div.uk-text-warning "You need to type something into the password input first."]
+    [:div.uk-text-warning (t :pick-chars-warning)]
     [:div.password-helper-grid.wrapping
      (map #(pick-char-button % selected-letters) (range (count password)))]))
 
@@ -65,7 +69,7 @@
   "Pick chars UI element"
   []
   [:div.password-helper-pick-chars-container
-   [:div.uk-card-title.uk-h4 "Pick Password Characters"]
+   [:div.uk-card-title.uk-h4 (t :pick-chars-header)]
    [pick-chars-buttons (state/get-password) (state/get-selected-letters)]
    [:a.uk-link-muted.password-helper-pick-chars-close {:href "#" :on-click actions/open-main-menu} "[X]"]])
 

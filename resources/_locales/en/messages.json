@@ -1,0 +1,29 @@
+{
+   "description": {
+     "message": "Automatically fills passwords on sites that ask for random password characters for you."
+   },
+
+   "input_placeholder": {
+     "message": "Enter your full password here"
+   },
+
+   "main_menu_header": {
+     "message": "Didn't work?"
+   },
+
+   "pick_password_chars_action": {
+     "message": "Pick password characters >"
+   },
+
+   "report_problem_action": {
+     "message": "Report problem >"
+   },
+
+   "pick_chars_warning": {
+     "message": "You need to type something into the password input first."
+   },
+
+   "pick_chars_header": {
+     "message": "Pick Password Characters"
+   }
+}

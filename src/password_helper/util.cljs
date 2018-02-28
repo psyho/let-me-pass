@@ -26,6 +26,25 @@
   (undefined? js/chrome.extension))
 
 
+(def translations
+  "Translations map used in inline mode"
+  {:description "Automatically fills passwords on sites that ask for random password characters for you."
+   :input-placeholder "Enter your full password here"
+   :main-menu-header "Didn't work?"
+   :pick-password-chars-action "Pick password characters >"
+   :report-problem-action "Report problem >"
+   :pick-chars-warning "You need to type something into the password input first."
+   :pick-chars-header "Pick Password Characters"})
+
+
+(defn t
+  "Gets i18n message by name"
+  [key]
+  (if running-inline
+    (get translations key (str "Key " (name key) " not found!"))
+    (js/chrome.i18n.getMessage (clojure.string/replace (name key) "-" "_"))))
+
+
 (defn get-asset-url
   "Returns asset URL"
   [type name]

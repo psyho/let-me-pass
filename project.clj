@@ -24,9 +24,9 @@
                                     :compiler {:output-to "target/unpacked/password_helper.js"
                                                :output-dir "target/unpacked"
                                                :optimizations :advanced
-                                               :source-map "target/unpacked/password_helper.js.map"
-                                               :pseudo-names true
-                                               :pretty-print true
+                                               ;:source-map "target/unpacked/password_helper.js.map"
+                                               ;:pseudo-names true
+                                               ;:pretty-print true
                                                :closure-output-charset "US-ASCII"
                                                :externs ["externs/externs.js"]
                                                }}

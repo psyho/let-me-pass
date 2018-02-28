@@ -1,0 +1,29 @@
+{
+  "description": {
+    "message": "Automatycznie wypełnia hasła na stronach, które wymagają podania losowych znaków z hasła."
+  },
+
+  "input_placeholder": {
+    "message": "Tu wpisz swoje hasło"
+  },
+
+  "main_menu_header": {
+    "message": "Nie działa?"
+  },
+
+  "pick_password_chars_action": {
+    "message": "Wybierz znaki >"
+  },
+
+  "report_problem_action": {
+    "message": "Zgłoś problem >"
+  },
+
+  "pick_chars_warning": {
+    "message": "Musisz wpisać hasło aby móc wybrać znaki."
+  },
+
+  "pick_chars_header": {
+    "message": "Wybierz znaki do uzupełnienia"
+  }
+}
