@@ -6,3 +6,4 @@ postmortems
 figwheel_server.log
 .lein-failures
 .lein-repl-history
+release.zip
