@@ -4,7 +4,7 @@
   "description": "__MSG_description__",
   "default_locale": "en",
   "author": "Adam Pohorecki",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "icons": {
     "16": "icon16.png",
     "19": "icon19.png",

@@ -1,6 +1,6 @@
 {
    "description": {
-     "message": "Automatically fills passwords on sites that ask for random password characters for you."
+     "message": "Don't like counting password characters? This extension will automatically fill random character password inputs for you."
    },
 
    "input_placeholder": {

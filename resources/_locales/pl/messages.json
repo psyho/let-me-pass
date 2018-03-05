@@ -1,6 +1,6 @@
 {
   "description": {
-    "message": "Automatycznie wypełnia hasła na stronach, które wymagają podania losowych znaków z hasła."
+    "message": "Nie lubisz wpisywać losowych znaków z hasła? Ta wtyczka wpisze je za Ciebie."
   },
 
   "input_placeholder": {
