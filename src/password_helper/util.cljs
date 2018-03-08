@@ -2,7 +2,9 @@
   (:require [cljs.core.async :as async :refer [>! go]]))
 
 
-(def debugging true)
+(goog-define debugging true)
+(goog-define running-inline false)
+
 (defn- debug
   "Prints a debug message if debugging is enabled"
   [message & args]
@@ -17,14 +19,6 @@
     (catch :default e
       (debug e)
       nil)))
-
-
-(def running-inline
-  "Flag indicating whether the app is running
-  inline - loaded directly into the page
-  not inline - as a chrome extension"
-  (undefined? js/chrome.extension))
-
 
 (def translations
   "Translations map used in inline mode"

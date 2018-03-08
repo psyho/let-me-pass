@@ -18,46 +18,55 @@
                         [lein-figwheel "0.5.14"]
                         [lein-chromebuild "0.3.0"]]
 
-              :cljsbuild {:builds {
-                                   :main
-                                   {:source-paths ["src"]
-                                    :compiler {:output-to "target/unpacked/password_helper.js"
-                                               :output-dir "target/unpacked"
-                                               :optimizations :advanced
-                                               :source-map "target/unpacked/password_helper.js.map"
-                                               :pseudo-names true
-                                               :pretty-print true
-                                               :closure-output-charset "US-ASCII"
-                                               :externs ["externs/externs.js"]
-                                               }}
+              :cljsbuild
+                       {
+                        :builds
+                        {
+                         :main
+                         {:source-paths ["src"]
+                          :compiler {:output-to "target/unpacked/password_helper.js"
+                                     :output-dir "target/unpacked"
+                                     :optimizations :advanced
+                                     :source-map "target/unpacked/password_helper.js.map"
+                                     :pseudo-names true
+                                     :pretty-print true
+                                     :closure-output-charset "US-ASCII"
+                                     :externs ["externs/externs.js"]
+                                     :closure-defines {password-helper.util/debugging true
+                                                       password-helper.util/running-inline false}
+                                     }}
 
-                                   :reloadable
-                                   {:source-paths ["src"]
-                                    :figwheel true
-                                    :compiler {:output-to "target/reloadable/password_helper.js"
-                                               :output-dir "target/reloadable"
-                                               :asset-path "../target/reloadable"
-                                               :main password-helper.content-start
-                                               :source-map true
-                                               :closure-output-charset "US-ASCII"
-                                               :pretty-print true}}
+                         :reloadable
+                         {:source-paths ["src"]
+                          :figwheel true
+                          :compiler {:output-to "target/reloadable/password_helper.js"
+                                     :output-dir "target/reloadable"
+                                     :asset-path "../target/reloadable"
+                                     :main password-helper.content-start
+                                     :source-map true
+                                     :closure-output-charset "US-ASCII"
+                                     :pretty-print true
+                                     :closure-defines {password-helper.util/debugging true
+                                                       password-helper.util/running-inline true}
+                                     }}
 
-                                   :test
-                                   {:source-paths ["src" "test"]
-                                    :compiler {:output-to "target/test/password_helper_test.js"
-                                               :output-dir "target/test"
-                                               :main password-helper.runner
-                                               :optimizations :whitespace
-                                               :source-map "target/test/password_helper_test.js.map"
-                                               :closure-output-charset "US-ASCII"
-                                               :pretty-print true}}}}
+                         :test
+                         {:source-paths ["src" "test"]
+                          :compiler {:output-to "target/test/password_helper_test.js"
+                                     :output-dir "target/test"
+                                     :main password-helper.runner
+                                     :optimizations :whitespace
+                                     :source-map "target/test/password_helper_test.js.map"
+                                     :closure-output-charset "US-ASCII"
+                                     :pretty-print true
+                                     :closure-defines {password-helper.util/debugging true
+                                                       password-helper.util/running-inline false}
+                                     }}}}
 
               :figwheel {:css-dirs ["resources/css"]}
 
-              :chromebuild {
-                            :resource-paths ["resources/js" "resources/css" "resources/images" "resources/fonts"]
-                            :unpacked-target-path "target/unpacked"
-                            }
+              :chromebuild {:resource-paths ["resources/js" "resources/css" "resources/images" "resources/fonts"]
+                            :unpacked-target-path "target/unpacked"}
 
               :eftest {:multithread? true}
               }
@@ -74,6 +83,8 @@
                                               :optimizations :advanced
                                               :closure-output-charset "US-ASCII"
                                               :externs ["externs/externs.js"]
+                                              :closure-defines {password-helper.util/debugging false
+                                                                password-helper.util/running-inline false}
                                               }}}}
 
               :chromebuild
