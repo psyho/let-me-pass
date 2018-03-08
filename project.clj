@@ -24,9 +24,9 @@
                                     :compiler {:output-to "target/unpacked/password_helper.js"
                                                :output-dir "target/unpacked"
                                                :optimizations :advanced
-                                               ;:source-map "target/unpacked/password_helper.js.map"
-                                               ;:pseudo-names true
-                                               ;:pretty-print true
+                                               :source-map "target/unpacked/password_helper.js.map"
+                                               :pseudo-names true
+                                               :pretty-print true
                                                :closure-output-charset "US-ASCII"
                                                :externs ["externs/externs.js"]
                                                }}
@@ -54,8 +54,28 @@
 
               :figwheel {:css-dirs ["resources/css"]}
 
-              :chromebuild {:resource-paths ["resources/js" "resources/css" "resources/images" "resources/fonts"]
-                            :target-path "target/unpacked"}
+              :chromebuild {
+                            :resource-paths ["resources/js" "resources/css" "resources/images" "resources/fonts"]
+                            :unpacked-target-path "target/unpacked"
+                            }
 
               :eftest {:multithread? true}
-              }})
+              }
+
+
+             :release
+             {
+              :cljsbuild
+              ^:replace {:builds {
+                                  :main
+                                  {:source-paths ["src"]
+                                   :compiler {:output-to "target/unpacked-release/password_helper.js"
+                                              :output-dir "target/unpacked-release"
+                                              :optimizations :advanced
+                                              :closure-output-charset "US-ASCII"
+                                              :externs ["externs/externs.js"]
+                                              }}}}
+
+              :chromebuild
+              {:unpacked-target-path "target/unpacked-release"}}}
+  )
