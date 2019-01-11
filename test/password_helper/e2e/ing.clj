@@ -6,10 +6,11 @@
 
 (def params {:login-url             "https://login.ingbank.pl/"
              :login-selector        {:id :login-input}
+             :valid-login           "jankow1234"
              :before-submit-login   (fn []
                                       (etaoin/wait-predicate
                                         #(not (etaoin/has-class? common/*driver* {:css "button.js-login"} :btn-disabled))))
-             :submit-login-selector [{:id :js-login-form} {:tag :button}]
+             :submit-login-selector [{:css "button.js-login"}]
              :idx-from-input        common/idx-from-input-id})
 
 (use-fixtures :each common/fixture-driver)

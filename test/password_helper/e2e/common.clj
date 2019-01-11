@@ -6,7 +6,7 @@
 
 (def project-dir (System/getProperty "user.dir"))
 
-(def password "1234567890abcdefghij")
+(def password "1234567890abcdefghijklmnopqrstuvwxyz")
 
 (defn fixture-driver
   "Executes a test running a driver. Binds a driver
